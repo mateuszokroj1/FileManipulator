@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="taskDefinitions"
+    targetNamespace="http://tempuri.org/taskDefinitions.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/taskDefinitions.xsd"
+    xmlns:mstns="http://tempuri.org/taskDefinitions.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<!-- Group: Watcher task -->
+	<xs:group name="WatcherTaskGroup">
+		
+	</xs:group>
+	
+	<!-- Group: Manipulator task -->
+	<xs:group name="ManipulatorTaskGroup">
+		
+	</xs:group>
+	
+	<!-- Global task type -->
+	<xs:complexType abstract="true" name="TaskType">
+		<xs:attribute name="Name" use="required" type="xs:string" />		
+		<xs:attribute name="Id" use="required" type="xs:ID" />
+	</xs:complexType>
+	
+	<!-- Main type -->
+	<xs:complexType name="MainElementType">
+		
+	</xs:complexType>
+	
+	<!-- Root element -->
+	<xs:element name="FileManipulator-TaskDefinitions" type="MainElementType" />
+</xs:schema>
