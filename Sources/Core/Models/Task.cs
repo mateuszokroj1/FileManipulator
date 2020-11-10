@@ -73,6 +73,7 @@ namespace FileManipulator
 
         public abstract STT.Task PauseAsync();
 
+        public abstract Task StopAsync();
 
         public abstract STT.Task ResetAsync();
 
