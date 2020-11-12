@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 
+using STT = System.Threading.Tasks;
+
 namespace FileManipulator
 {
     public interface ITask : IDisposable, INotifyPropertyChanged
@@ -19,11 +21,13 @@ namespace FileManipulator
 
         #region Methods
 
-        Task StartAsync();
+        STT.Task StartAsync();
 
-        Task StopAsync();
+        STT.Task StopAsync();
 
-        Task PauseAsync();
+        STT.Task PauseAsync();
+
+        STT.Task ResetAsync();
 
         #endregion
     }

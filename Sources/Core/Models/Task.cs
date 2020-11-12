@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using STT = System.Threading.Tasks;
 
 namespace FileManipulator
 {
@@ -37,7 +38,7 @@ namespace FileManipulator
         /// <summary>
         /// Provides progress reporting
         /// </summary>
-        public IProgress<float> Progress { get; private set; } = new Progress<float>();
+        public IProgress<float> Progress { get; } = new Progress<float>();
 
         /// <summary>
         /// Unique id
@@ -63,11 +64,17 @@ namespace FileManipulator
 
         #region Methods
 
-        public abstract Task StartAsync();
+        /// <summary>
+        /// Starts task
+        /// </summary>
+        public abstract STT.Task StartAsync();
 
-        public abstract Task StopAsync();
+        public abstract STT.Task StopAsync();
 
-        public abstract Task PauseAsync();
+        public abstract STT.Task PauseAsync();
+
+
+        public abstract STT.Task ResetAsync();
 
         public abstract void Dispose();
 
