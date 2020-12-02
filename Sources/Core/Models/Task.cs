@@ -38,7 +38,7 @@ namespace FileManipulator
         /// <summary>
         /// Provides progress reporting
         /// </summary>
-        public IProgress<float> Progress { get; } = new Progress<float>();
+        public TaskProgress Progress { get; } = new TaskProgress();
 
         /// <summary>
         /// Unique id
