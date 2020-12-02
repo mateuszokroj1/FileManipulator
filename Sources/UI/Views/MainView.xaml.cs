@@ -8,5 +8,13 @@ namespace FileManipulator.UI
         {
             InitializeComponent();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            var model = DataContext as MainViewModel;
+
+            model?.Close(() => Close());
+        }
     }
 }

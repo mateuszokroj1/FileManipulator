@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FileManipulator.UI"
         xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
         mc:Ignorable="d"
-        Title="File Manipulator" Height="450" Width="800">
+        Title="File Manipulator" Height="450" Width="800" Closing="Window_Closing">
     <Window.DataContext>
         <core:MainViewModel />
     </Window.DataContext>
