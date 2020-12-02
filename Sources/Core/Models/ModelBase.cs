@@ -17,7 +17,9 @@ namespace FileManipulator
                     handler => PropertyChanged += handler,
                     handler => PropertyChanged -= handler
                 )
+                .Where(args => !string.IsNullOrWhiteSpace(args?.EventArgs?.PropertyName))
                 .Select(args => args.EventArgs.PropertyName);
+                
         }
 
         #endregion
@@ -48,6 +50,17 @@ namespace FileManipulator
 
             destination = newValue;
             OnPropertyChanged(propertyName);
+        }
+
+        protected void SetProperty<T>(ref T destination, T newValue, params string[] propertiesNames)
+        {
+            if (Equals(destination, newValue)) return;
+
+            destination = newValue;
+
+            if (propertiesNames?.Length > 0)
+                foreach (var name in propertiesNames)
+                    OnPropertyChanged(name);
         }
 
         #endregion
