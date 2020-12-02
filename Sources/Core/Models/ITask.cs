@@ -17,6 +17,8 @@ namespace FileManipulator
 
         Guid Id { get; }
 
+        Exception LastError { get; set; }
+
         #endregion
 
         #region Methods
