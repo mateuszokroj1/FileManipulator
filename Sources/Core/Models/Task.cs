@@ -69,11 +69,19 @@ namespace FileManipulator
         /// </summary>
         public abstract STT.Task StartAsync();
 
+        /// <summary>
+        /// Stops task
+        /// </summary>
         public abstract STT.Task StopAsync();
 
+        /// <summary>
+        /// Pauses task
+        /// </summary>
         public abstract STT.Task PauseAsync();
 
-
+        /// <summary>
+        /// Resets state of task
+        /// </summary>
         public abstract STT.Task ResetAsync();
 
         public abstract void Dispose();
