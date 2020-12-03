@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace FileManipulator
 {
@@ -27,6 +28,11 @@ namespace FileManipulator
             set => SetProperty(ref this.selectedTask, value);
         }
 
+        public bool IsAnyWorkingTasks =>
+            Tasks
+            .Where(task => task.State == TaskState.Paused || task.State == TaskState.Working)
+            .Count() > 0;
+
         #region Commands
 
 
@@ -37,8 +43,17 @@ namespace FileManipulator
 
         #region Methods
 
-        public void Close(Action onCompleted)
+        public async void Close(Func<bool> showMessage, Action onCompleted)
         {
+            if(IsAnyWorkingTasks)
+            {
+                if (!showMessage()) return;
+
+                foreach (var task in Tasks)
+                    await task.StopAsync();
+
+                Tasks.Clear();
+            }
 
             onCompleted?.Invoke();
         }

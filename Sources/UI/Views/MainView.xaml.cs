@@ -14,7 +14,16 @@ namespace FileManipulator.UI
             e.Cancel = true;
             var model = DataContext as MainViewModel;
 
-            model?.Close(() => Close());
+            model?.Close(() =>
+            {
+                return MessageBox.Show(
+                    Messages.Komunikat_przy_zamykaniu_aplikacji,
+                    "File Manipulator",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.No) == MessageBoxResult.Yes;
+            },
+            () => Close());
         }
     }
 }
