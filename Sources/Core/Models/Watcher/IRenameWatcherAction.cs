@@ -1,4 +1,4 @@
-﻿namespace FileManipulator.Models
+﻿namespace FileManipulator
 {
     public interface IRenameWatcherAction
     {

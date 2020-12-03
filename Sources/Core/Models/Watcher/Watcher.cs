@@ -5,6 +5,8 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Text;
 
+using FileManipulator.Models;
+
 using STT = System.Threading.Tasks;
 
 namespace FileManipulator
@@ -35,6 +37,8 @@ namespace FileManipulator
                             EnableRaisingEvents = false,
                             IncludeSubdirectories = true
                         };
+
+                        ConfigureNewWatcher();
                     }
 
                     OnPropertyChanged(nameof(IncludeSubdirectories));
@@ -72,6 +76,12 @@ namespace FileManipulator
             }
         }
 
+        public bool CanPause => State == TaskState.Working;
+
+        public bool CanStop => State == TaskState.Working || State == TaskState.Paused;
+
+        public bool CanStart => State == TaskState.Stopped || State == TaskState.Ready;
+
         public ObservableCollection<WatcherAction> Actions { get; } = new ObservableCollection<WatcherAction>();
 
         #endregion
@@ -80,7 +90,7 @@ namespace FileManipulator
 
         public override async STT.Task PauseAsync()
         {
-            if (State != TaskState.Working) return;
+            if (!CanPause) return;
 
             Pausing.OnNext(new TaskEventArgs(this));
             
@@ -107,14 +117,103 @@ namespace FileManipulator
             Progress.Report(0, Messages.ReadyState);
         }
 
-        public override STT.Task StartAsync()
+        public override async STT.Task StartAsync()
         {
-            throw new NotImplementedException();
+            if (!CanStart) return;
+
+            Starting.OnNext(new TaskEventArgs(this));
+
+            if (this.watcher == null)
+                throw new InvalidOperationException("Watcher is null.");
+
+            try
+            {
+                this.watcher.EnableRaisingEvents = true;
+            }
+            catch(Exception exc)
+            {
+                LastError = exc;
+                State = TaskState.Error;
+                Error.OnNext(new TaskErrorEventArgs(exc, this));
+                this.watcher?.Dispose();
+                this.watcher = null;
+                return;
+            }
+
+            Started.OnNext(new TaskEventArgs(this));
+
+            State = TaskState.Working;
         }
 
         public override async STT.Task StopAsync()
         {
-            
+            if (!CanStop) return;
+
+            Stopping.OnNext(new TaskEventArgs(this));
+
+            this.watcher.EnableRaisingEvents = false;
+
+            Stopped.OnNext(new TaskEventArgs(this));
+
+            State = TaskState.Stopped;
+        }
+
+        private void SetLastError(Exception exception)
+        {
+            this.watcher?.Dispose();
+            this.watcher = null;
+            LastError = exception;
+            Error.OnNext(new TaskErrorEventArgs(exception, this));
+            State = TaskState.Error;
+        }
+
+        private void ConfigureNewWatcher()
+        {
+            Observable.FromEventPattern<ErrorEventHandler, ErrorEventArgs>(
+                handler => this.watcher.Error += handler,
+                handler => this.watcher.Error -= handler
+            )
+            .Subscribe(args => SetLastError(args.EventArgs.GetException()));
+
+            Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+                handler => this.watcher.Created += handler,
+                handler => this.watcher.Created -= handler
+            )
+            .Subscribe(args => Actions.Add(new ChangeWatcherAction
+            {
+                ChangeType = ChangeType.Created,
+                Path = args.EventArgs.FullPath
+            }));
+
+            Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+                handler => this.watcher.Changed += handler,
+                handler => this.watcher.Changed -= handler
+            )
+            .Subscribe(args => Actions.Add(new ChangeWatcherAction
+            {
+                ChangeType = ChangeType.Modified,
+                Path = args.EventArgs.FullPath
+            }));
+
+            Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+                handler => this.watcher.Deleted += handler,
+                handler => this.watcher.Deleted -= handler
+            )
+            .Subscribe(args => Actions.Add(new ChangeWatcherAction
+            {
+                ChangeType = ChangeType.Deleted,
+                Path = args.EventArgs.FullPath
+            }));
+
+            Observable.FromEventPattern<RenamedEventHandler, RenamedEventArgs>(
+                handler => this.watcher.Renamed += handler,
+                handler => this.watcher.Renamed -= handler
+            )
+            .Subscribe(args => Actions.Add(new RenameWatcherAction
+            {
+                DestinationPath = args.EventArgs.FullPath,
+                Path = args.EventArgs.OldFullPath
+            }));
         }
 
         public override void Dispose()
