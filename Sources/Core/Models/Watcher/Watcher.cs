@@ -78,13 +78,31 @@ namespace FileManipulator
 
         #region Methods
 
-        public override STT.Task PauseAsync()
+        public override async STT.Task PauseAsync()
         {
-            throw new NotImplementedException();
+            if (State != TaskState.Working) return;
+
+            Pausing.OnNext(new TaskEventArgs(this));
+            
+            State = TaskState.Paused;
+            this.watcher.EnableRaisingEvents = false;
+
+            Paused.OnNext(new TaskEventArgs(this));
         }
 
         public override async STT.Task ResetAsync()
         {
+            this.watcher?.Dispose();
+            this.watcher = null;
+
+            if (State == TaskState.Working || State == TaskState.Paused)
+            {
+                Stopping.OnNext(new TaskEventArgs(this));
+                Stopped.OnNext(new TaskEventArgs(this));
+            }
+
+            State = TaskState.Ready;
+
             Actions.Clear();
             Progress.Report(0, Messages.ReadyState);
         }
@@ -94,9 +112,9 @@ namespace FileManipulator
             throw new NotImplementedException();
         }
 
-        public override STT.Task StopAsync()
+        public override async STT.Task StopAsync()
         {
-            throw new NotImplementedException();
+            
         }
 
         public override void Dispose()
