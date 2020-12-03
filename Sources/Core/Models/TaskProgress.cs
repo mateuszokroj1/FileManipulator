@@ -1,9 +1,28 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Reactive.Linq;
 
 namespace FileManipulator
 {
     public class TaskProgress : ModelBase, IProgress<float>
     {
+        #region Constructor
+
+        public TaskProgress()
+        {
+            OnValueChanged =
+                PropertyChangedObservable
+                .Where(propertyName => propertyName == nameof(ProgressValue))
+                .Select(p => ProgressValue);
+
+            OnStatusChanged =
+                PropertyChangedObservable
+                .Where(propertyName => propertyName == nameof(Status))
+                .Select(p => Status);
+        }
+
+        #endregion
+
         #region Fields
 
         private float progressValue;
@@ -24,6 +43,10 @@ namespace FileManipulator
             get => this.progressValue;
             set => SetProperty(ref this.progressValue, value);
         }
+
+        public IObservable<float> OnValueChanged { get; }
+
+        public IObservable<string> OnStatusChanged { get; }
 
         #endregion
 
