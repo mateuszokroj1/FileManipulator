@@ -210,7 +210,7 @@ namespace FileManipulator
                 handler => this.watcher.Renamed -= handler
             )
             .Subscribe(args => Actions.Add(new RenameWatcherAction
-            {
+        {
                 DestinationPath = args.EventArgs.FullPath,
                 Path = args.EventArgs.OldFullPath
             }));

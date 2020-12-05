@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Komunikat_przy_zamykaniu_aplikacji" xml:space="preserve">
+    <value>Istnieją działające zadania. Czy chcesz je przerwać?</value>
+  </data>
   <data name="Nieoczekiwany_blad1" xml:space="preserve">
     <value>Wystąpił nieoczekiwany błąd, który uniemożliwia kontynuowanie pracy.\n\rAplikacja zostanie zamknięta.\n\rSzczegóły błędu znajdują się w pliku {0} na pulpicie.</value>
     <comment>App.xaml.cs</comment>

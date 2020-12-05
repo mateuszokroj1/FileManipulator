@@ -61,6 +61,15 @@ namespace FileManipulator.UI {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Istnieją działające zadania. Czy chcesz je przerwać?.
+        /// </summary>
+        internal static string Komunikat_przy_zamykaniu_aplikacji {
+            get {
+                return ResourceManager.GetString("Komunikat_przy_zamykaniu_aplikacji", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Wystąpił nieoczekiwany błąd, który uniemożliwia kontynuowanie pracy.\n\rAplikacja zostanie zamknięta.\n\rSzczegóły błędu znajdują się w pliku {0} na pulpicie..
         /// </summary>
         internal static string Nieoczekiwany_blad1 {
