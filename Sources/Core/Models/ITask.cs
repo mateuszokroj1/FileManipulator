@@ -11,7 +11,7 @@ namespace FileManipulator
 
         TaskState State { get; }
 
-        IProgress<float> Progress { get; }
+        TaskProgress Progress { get; }
 
         string Name { get; set; }
 

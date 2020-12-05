@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reactive.Linq;
-using System.Text;
-
-using FileManipulator.Models;
 
 using STT = System.Threading.Tasks;
 

@@ -93,7 +93,6 @@
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\FilesSelectorViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\Controls\FilesSelectorControl.xaml.cs">
       <DependentUpon>FilesSelectorControl.xaml</DependentUpon>
     </Compile>
