@@ -9,12 +9,31 @@ namespace FileManipulator.UI
 {
     public class MainViewModel : ModelBase
     {
-        #region Construktor
+        #region Constructor
 
         public MainViewModel()
         {
-
+            
         }
+
+        #endregion
+
+        #region Fields
+
+
+        #endregion
+
+        #region Properties
+
+
+
+        #endregion
+
+        #region Methods
+
+
+
+        #endregion
 
     }
 }
