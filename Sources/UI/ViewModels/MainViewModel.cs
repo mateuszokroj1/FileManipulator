@@ -31,7 +31,13 @@ namespace FileManipulator.UI
 
         #region Methods
 
+        public void Close(Func<bool> canClose, Action action)
+        {
+            // TODO: W tym miejscu powinno się sprawdzić czy jakiś Task (z kolekcji Tasków, która powinna tu być) jest w trybie działającym, jeśli nie to od razu wykonać 'action'
 
+            if (canClose())
+                action();
+        }
 
         #endregion
 
