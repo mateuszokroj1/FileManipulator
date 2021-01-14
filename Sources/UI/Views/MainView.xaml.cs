@@ -11,7 +11,6 @@ namespace FileManipulator.UI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = true;
             var model = DataContext as MainViewModel;
 
             model?.Close(() =>
@@ -23,7 +22,7 @@ namespace FileManipulator.UI
                     MessageBoxImage.Warning,
                     MessageBoxResult.No) == MessageBoxResult.Yes;
             },
-            () => Close());
+            e);
         }
     }
 }

@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="File Manipulator" Height="450" Width="800" Closing="Window_Closing">
     <Window.DataContext>
-        <core:MainViewModel />
+        <local:MainViewModel />
     </Window.DataContext>
     
 </Window>
