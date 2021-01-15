@@ -11,8 +11,15 @@ namespace FileManipulator
 
         public Manipulator(IEnumerable<Task> tasks)
         {
-
+            var generator = new TaskDefaultNameGenerator<Watcher>(tasks);
+            Name = generator.Generate();
         }
+
+        #endregion
+
+        #region Properties
+
+        public List<IFileFilter> Filters { get; } = new List<IFileFilter>();
 
         #endregion
 
