@@ -6,32 +6,37 @@
              xmlns:local="clr-namespace:FileManipulator.UI"
              xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
              mc:Ignorable="d" 
+             x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.DataContext>
         <core:TasksViewModel />
     </UserControl.DataContext>
     <Grid>
-        <TabControl ItemsSource="{Binding }" SelectedItem="{Binding }" Template="" ItemTemplateSelector="" />
-        <Button Content="+">
+        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}" />
+        <Button Content="+" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
             <Button.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Watcher" />
-                    <MenuItem Header="Manipulator" />
+                    <MenuItem Header="Watcher" Command="{Binding CreateNewWatcherCommand}" />
+                    <MenuItem Header="Manipulator" Command="{Binding CreateNewManipulatorCommand}" />
                 </ContextMenu>
             </Button.ContextMenu>
-            <Button.Triggers>
-                <EventTrigger RoutedEvent="Click">
-                    <EventTrigger.Actions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
-                                    <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True" />
-                                </BooleanAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger.Actions>
-                </EventTrigger>
-            </Button.Triggers>
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <EventTrigger RoutedEvent="Click">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
+                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True" />
+                                        </BooleanAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
         </Button>
     </Grid>
 </UserControl>

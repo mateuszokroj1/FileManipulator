@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FileManipulator.UI
 {
@@ -23,6 +13,49 @@ namespace FileManipulator.UI
         public TasksView()
         {
             InitializeComponent();
+
+            var model = DataContext as TasksViewModel;
+
+            var binding = new Binding("Tasks");
+            binding.Source = model;
+            binding.Mode = BindingMode.TwoWay;
+            SetBinding(ItemsSourceProperty, binding);
+
+            binding = new Binding("SelectedItem");
+            binding.Source = model;
+            binding.Mode = BindingMode.TwoWay;
+            SetBinding(SelectedItemProperty, binding);
         }
+
+        #region Fields
+
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
+            "ItemsSource",
+            typeof(ICollection<Task>),
+            typeof(TasksView));
+
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(
+            "SelectedItem",
+            typeof(Task),
+            typeof(TasksView)
+            );
+
+        #endregion
+
+        #region Properties
+
+        public ICollection<Task> ItemsSource
+        {
+            get => GetValue(ItemsSourceProperty) as ICollection<Task>;
+            set => SetValue(ItemsSourceProperty, value);
+        }
+
+        public Task SelectedItem
+        {
+            get => GetValue(SelectedItemProperty) as Task;
+            set => SetValue(SelectedItemProperty, value);
+        }
+
+        #endregion
     }
 }
