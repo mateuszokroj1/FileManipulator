@@ -1,10 +1,23 @@
-﻿using STT = System.Threading.Tasks;
+﻿using System.Collections;
+using System.Collections.Generic;
+
+using STT = System.Threading.Tasks;
 
 namespace FileManipulator
 {
     public class Manipulator : Task, IManipulator
     {
-        
+        #region Constructor
+
+        public Manipulator(IEnumerable<Task> tasks)
+        {
+
+        }
+
+        #endregion
+
+        #region Methods
+
         public override STT.Task PauseAsync()
         {
             throw new System.NotImplementedException();
@@ -29,5 +42,7 @@ namespace FileManipulator
         {
             throw new System.NotImplementedException();
         }
+
+        #endregion
     }
 }
