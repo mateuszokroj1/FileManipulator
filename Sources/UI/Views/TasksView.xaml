@@ -12,11 +12,33 @@
         <core:TasksViewModel />
     </UserControl.DataContext>
     <UserControl.Resources>
-        
+        <local:TasksViewTemplateSelector x:Key="StyleSelector">
+            <local:TasksViewTemplateSelector.WatcherTemplate>
+                <DataTemplate DataType="{x:Type core:Watcher}">
+                    
+                </DataTemplate>
+            </local:TasksViewTemplateSelector.WatcherTemplate>
+            <local:TasksViewTemplateSelector.ManipulatorTemplate>
+                <DataTemplate DataType="{x:Type core:Manipulator}">
+                    
+                </DataTemplate>
+            </local:TasksViewTemplateSelector.ManipulatorTemplate>
+            <local:TasksViewTemplateSelector.UndefinedTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">Wybierz poprawne zadanie</Label>
+                    </Grid>
+                </DataTemplate>
+            </local:TasksViewTemplateSelector.UndefinedTemplate>
+        </local:TasksViewTemplateSelector>
     </UserControl.Resources>
     <Grid>
-        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}">
-            
+        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}" ItemTemplateSelector="{StaticResource StyleSelector}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Header" Value="{Binding Name}" />
+                </Style>
+            </TabControl.ItemContainerStyle>
             <TabControl.Resources>
                 <Style TargetType="TabItem">
                     <Setter Property="Template">
@@ -24,8 +46,12 @@
                             <ControlTemplate TargetType="TabItem">
                                 <Border>
                                     <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
                                         <Label Content="{TemplateBinding Header}" />
-                                        <Button>x</Button>
+                                        <Button Width="20" Height="20">x</Button>
                                     </Grid>
                                 </Border>
                             </ControlTemplate>
