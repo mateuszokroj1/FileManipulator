@@ -11,8 +11,29 @@
     <UserControl.DataContext>
         <core:TasksViewModel />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
     <Grid>
-        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}" />
+        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}">
+            
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border>
+                                    <Grid>
+                                        <Label Content="{TemplateBinding Header}" />
+                                        <Button>x</Button>
+                                    </Grid>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+        </TabControl>
         <Button Content="+" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
             <Button.ContextMenu>
                 <ContextMenu>

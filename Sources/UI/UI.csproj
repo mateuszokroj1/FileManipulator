@@ -92,6 +92,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
+    <Compile Include="Selectors\TasksViewTemplateSelector.cs" />
     <Compile Include="ViewModels\FilesSelectorViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\Controls\FilesSelectorControl.xaml.cs">
