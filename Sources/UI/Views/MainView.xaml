@@ -21,10 +21,28 @@
             </RowDefinition>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
-            <MenuItem Header="">
-                
+            
+                <MenuItem Header="Plik">
+                <MenuItem Header="Nowe zadanie"></MenuItem>
+                <MenuItem Header="Usuń zadanie" ></MenuItem>
+                <MenuItem Header="Otwórz bibliotekę zadań" ></MenuItem>
+
+               
             </MenuItem>
+
+            <MenuItem Header="Edycja">
+                <MenuItem Header="Edytuj nazwę zadania"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Zamknij aplikację"></MenuItem>
+            <MenuItem Header="Otwórz pomoc"></MenuItem>
+
+
+
+
+
+
         </Menu>
+        
         <local:TasksView Grid.Row="1">
             
         </local:TasksView>
