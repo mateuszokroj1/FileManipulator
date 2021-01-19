@@ -10,5 +10,24 @@
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions> 
+            <RowDefinition Height="auto">  
+                  
+            </RowDefinition>
+            <RowDefinition Height="*">
+                
+            </RowDefinition>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="">
+                
+            </MenuItem>
+        </Menu>
+        <local:TasksView Grid.Row="1">
+            
+        </local:TasksView>
+    </Grid>
     
 </Window>
