@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace FileManipulator
 {
-    public class AlphanumericComparer : IComparer
+    public class AlphanumericComparer : IComparer<string>
     {
         private enum ChunkType { Alphanumeric, Numeric };
 
@@ -21,52 +21,47 @@ namespace FileManipulator
                 && (type != ChunkType.Numeric || char.IsDigit(ch));
         }
 
-        public int Compare(object x, object y)
+        public int Compare(string x, string y)
         {
-            if (!(x is string s1) || !(y is string s2))
-            {
-                return 0;
-            }
-
             int thisMarker = 0, thisNumericChunk;
             int thatMarker = 0, thatNumericChunk;
 
-            while (thisMarker < s1.Length || thatMarker < s2.Length)
+            while (thisMarker < x.Length || thatMarker < y.Length)
             {
-                if (thisMarker >= s1.Length)
+                if (thisMarker >= x.Length)
                 {
                     return -1;
                 }
-                else if (thatMarker >= s2.Length)
+                else if (thatMarker >= y.Length)
                 {
                     return 1;
                 }
 
-                char thisCh = s1[thisMarker];
-                char thatCh = s2[thatMarker];
+                char thisCh = x[thisMarker];
+                char thatCh = y[thatMarker];
 
                 var thisChunk = new StringBuilder();
                 var thatChunk = new StringBuilder();
 
-                while (thisMarker < s1.Length && (thisChunk.Length == 0 || InChunk(thisCh, thisChunk[0])))
+                while (thisMarker < x.Length && (thisChunk.Length == 0 || InChunk(thisCh, thisChunk[0])))
                 {
                     thisChunk.Append(thisCh);
                     thisMarker++;
 
-                    if (thisMarker < s1.Length)
+                    if (thisMarker < x.Length)
                     {
-                        thisCh = s1[thisMarker];
+                        thisCh = x[thisMarker];
                     }
                 }
 
-                while (thatMarker < s2.Length && (thatChunk.Length == 0 || InChunk(thatCh, thatChunk[0])))
+                while (thatMarker < y.Length && (thatChunk.Length == 0 || InChunk(thatCh, thatChunk[0])))
                 {
                     thatChunk.Append(thatCh);
                     thatMarker++;
 
-                    if (thatMarker < s2.Length)
+                    if (thatMarker < y.Length)
                     {
-                        thatCh = s2[thatMarker];
+                        thatCh = y[thatMarker];
                     }
                 }
 
