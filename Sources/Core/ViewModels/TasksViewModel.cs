@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
+using FileManipulator.Models.Watcher;
+
 namespace FileManipulator
 {
     public class TasksViewModel : ModelBase
@@ -38,6 +40,7 @@ namespace FileManipulator
         }
 
         public ICommand CreateNewWatcherCommand { get; }
+
         public ICommand CreateNewManipulatorCommand { get; }
 
         #endregion
