@@ -1,4 +1,4 @@
-﻿namespace FileManipulator
+﻿namespace FileManipulator.Models.Watcher
 {
     public class RenameWatcherAction : WatcherAction, IRenameWatcherAction
     {

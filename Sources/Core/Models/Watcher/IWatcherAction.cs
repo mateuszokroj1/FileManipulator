@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileManipulator
+namespace FileManipulator.Models.Watcher
 {
     public interface IWatcherAction
     {
