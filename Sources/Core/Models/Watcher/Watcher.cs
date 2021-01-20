@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 
 using STT = System.Threading.Tasks;
 
-namespace FileManipulator
+namespace FileManipulator.Models.Watcher
 {
     public class Watcher : Task
     {
