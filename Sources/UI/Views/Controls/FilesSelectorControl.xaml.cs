@@ -13,6 +13,7 @@ namespace FileManipulator.UI
         public FilesSelectorControl()
         {
             InitializeComponent();
+
             var model = DataContext as FilesSelectorViewModel;
             var binding = new Binding("SelectedFiles");
             binding.Source = model;

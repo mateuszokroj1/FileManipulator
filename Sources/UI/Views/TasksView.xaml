@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManipulator.UI"
              xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
+             xmlns:watcher="clr-namespace:FileManipulator.Models.Watcher;assembly=FileManipulator.Core"
+             xmlns:manipulator="clr-namespace:FileManipulator.Models.Manipulator;assembly=FileManipulator.Core"
              mc:Ignorable="d" 
              x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -12,15 +14,15 @@
         <core:TasksViewModel />
     </UserControl.DataContext>
     <UserControl.Resources>
-        <local:TasksViewTemplateSelector x:Key="StyleSelector">
+        <local:TasksViewTemplateSelector x:Key="TemplateSelector">
             <local:TasksViewTemplateSelector.WatcherTemplate>
-                <DataTemplate DataType="{x:Type core:Watcher}">
-                    
+                <DataTemplate DataType="{x:Type watcher:Watcher}">
+                    <local:WatcherView/>
                 </DataTemplate>
             </local:TasksViewTemplateSelector.WatcherTemplate>
             <local:TasksViewTemplateSelector.ManipulatorTemplate>
-                <DataTemplate DataType="{x:Type core:Manipulator}">
-                    
+                <DataTemplate DataType="{x:Type manipulator:Manipulator}">
+                    <local:ManipulatorView/>
                 </DataTemplate>
             </local:TasksViewTemplateSelector.ManipulatorTemplate>
             <local:TasksViewTemplateSelector.UndefinedTemplate>
@@ -33,7 +35,7 @@
         </local:TasksViewTemplateSelector>
     </UserControl.Resources>
     <Grid>
-        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}" ItemTemplateSelector="{StaticResource StyleSelector}">
+        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}" ItemTemplateSelector="{StaticResource TemplateSelector}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
                     <Setter Property="Header" Value="{Binding Name}" />
@@ -44,7 +46,7 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="TabItem">
-                                <Border>
+                                <Border BorderThickness="1" BorderBrush="#ccc">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
