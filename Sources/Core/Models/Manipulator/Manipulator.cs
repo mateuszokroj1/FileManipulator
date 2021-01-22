@@ -11,7 +11,7 @@ using FileManipulator.Models.Manipulator.Manipulations;
 
 using STT = System.Threading.Tasks;
 
-namespace FileManipulator
+namespace FileManipulator.Models.Manipulator
 {
     public class Manipulator : Task, IManipulator
     {

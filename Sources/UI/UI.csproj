@@ -101,8 +101,14 @@
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ManipulatorView.xaml.cs">
+      <DependentUpon>ManipulatorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TasksView.xaml.cs">
       <DependentUpon>TasksView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WatcherView.xaml.cs">
+      <DependentUpon>WatcherView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -155,7 +161,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ManipulatorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\TasksView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WatcherView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
