@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Reactive.Linq;
+using System.Windows.Input;
 
 using STT = System.Threading.Tasks;
 
@@ -12,18 +14,21 @@ namespace FileManipulator.Models.Watcher
     {
         #region Constructor
 
-        public Watcher(IEnumerable<Task> tasks)
+        public Watcher(ICollection<Task> tasks)
         {
+            this.tasksCollection = tasks ?? throw new ArgumentNullException(nameof(tasks));
+
             var generator = new TaskDefaultNameGenerator<Watcher>(tasks);
             Name = generator.Generate();
             ResetAsync().Wait();
             State = TaskState.Ready;
 
             this.pathObserver =
-                PropertyChangedObservable
-                .Where(propertyName => propertyName == nameof(Path))
-                .Where(p => State != TaskState.Working && State != TaskState.Paused)
-                .Subscribe(p =>
+            Observable.FromEventPattern(this, "PropertyChanged")
+            .Select(args => (args.EventArgs as PropertyChangedEventArgs)?.PropertyName)
+            .Where(propertyName => propertyName == nameof(Path))
+            .Where(p => State != TaskState.Working && State != TaskState.Paused)
+            .Subscribe(p =>
                 {
                     this.watcher.Dispose();
 
@@ -40,6 +45,8 @@ namespace FileManipulator.Models.Watcher
 
                     OnPropertyChanged(nameof(IncludeSubdirectories));
                 });
+
+            CloseCommand = new Command(() => Close());
         }
 
         #endregion
@@ -49,7 +56,8 @@ namespace FileManipulator.Models.Watcher
         private string path;
         private FileSystemWatcher watcher;
         private readonly IDisposable pathObserver;
-
+        private readonly ICollection<Task> tasksCollection;
+        
         #endregion
 
         #region Properties
@@ -80,6 +88,8 @@ namespace FileManipulator.Models.Watcher
         public bool CanStart => State == TaskState.Stopped || State == TaskState.Ready;
 
         public ObservableCollection<WatcherAction> Actions { get; } = new ObservableCollection<WatcherAction>();
+
+        public ICommand CloseCommand { get; }
 
         #endregion
 
@@ -211,6 +221,11 @@ namespace FileManipulator.Models.Watcher
                 DestinationPath = args.EventArgs.FullPath,
                 Path = args.EventArgs.OldFullPath
             }));
+        }
+
+        public void Close()
+        {
+            base.Close(this.tasksCollection);
         }
 
         public override void Dispose()

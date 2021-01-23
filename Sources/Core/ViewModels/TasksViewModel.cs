@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
+using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Watcher;
 
 namespace FileManipulator
@@ -20,14 +21,14 @@ namespace FileManipulator
 
         #region Fields
 
-        private ICollection<Task> tasks;
+        private ObservableCollection<Task> tasks;
         private Task selectedItem;
 
         #endregion
 
         #region Properties
 
-        public ICollection<Task> Tasks
+        public ObservableCollection<Task> Tasks
         {
             get => this.tasks;
             set => SetProperty(ref this.tasks, value);
