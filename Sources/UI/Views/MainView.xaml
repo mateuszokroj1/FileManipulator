@@ -6,46 +6,34 @@
         xmlns:local="clr-namespace:FileManipulator.UI"
         xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
         mc:Ignorable="d"
+        x:Name="Window"
         Title="File Manipulator" Height="450" Width="800" Closing="Window_Closing">
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
-
+    <Window.InputBindings>
+        <KeyBinding Key="F1"  />
+    </Window.InputBindings>
     <Grid>
-        <Grid.RowDefinitions> 
-            <RowDefinition Height="auto">  
-                  
-            </RowDefinition>
-            <RowDefinition Height="*">
-                
-            </RowDefinition>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
-            
-                <MenuItem Header="Plik">
-                <MenuItem Header="Nowe zadanie"></MenuItem>
-                <MenuItem Header="Usuń zadanie" ></MenuItem>
-                <MenuItem Header="Otwórz bibliotekę zadań" ></MenuItem>
-
-               
+            <MenuItem Header="Zadania">
+                <MenuItem Header="Nowe zadanie">
+                    <MenuItem Header="Watcher" Command="{Binding CreateNewWatcherTaskCommand}" />
+                    <MenuItem Header="Manipulator" Command="{Binding CreateNewManipulatorTaskCommand}" />
+                </MenuItem>
+                <MenuItem Header="Edytuj nazwę zadania" />
+                <MenuItem Header="Zakończ zadanie" />
+                <Separator/>
+                <MenuItem Header="Otwórz bibliotekę zadań..." />
             </MenuItem>
-
-            <MenuItem Header="Edycja">
-                <MenuItem Header="Edytuj nazwę zadania"></MenuItem>
-            </MenuItem>
-            <MenuItem Header="Zamknij aplikację"></MenuItem>
-            <MenuItem Header="Otwórz pomoc"></MenuItem>
-
-
-
-
-
-
+            <MenuItem Header="Pomoc"  />
+            <MenuItem Header="Zamknij aplikację" Command="{x:Static ApplicationCommands.Close}" />
         </Menu>
-        
-        <local:TasksView Grid.Row="1">
-            
-        </local:TasksView>
+        <local:TasksView Grid.Row="1" DataContext="{Binding DataContext, ElementName=Window}" Tasks="{Binding Tasks, Mode=OneWay}" SelectedItem="{Binding SelectedTask, Mode=TwoWay}" />
     </Grid>
     
 </Window>

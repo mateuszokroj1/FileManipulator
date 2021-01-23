@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace FileManipulator.UI
 {
     /// <summary>
-    /// Logika interakcji dla klasy ManipulatorView.xaml
+    /// Logika interakcji dla klasy TasksLibraryWindow.xaml
     /// </summary>
-    public partial class ManipulatorView : UserControl
+    public partial class TasksLibraryWindow : Window
     {
-        public ManipulatorView()
+        public TasksLibraryWindow()
         {
             InitializeComponent();
         }

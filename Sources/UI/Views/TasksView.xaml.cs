@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,7 +19,7 @@ namespace FileManipulator.UI
             var binding = new Binding("Tasks");
             binding.Source = model;
             binding.Mode = BindingMode.TwoWay;
-            SetBinding(ItemsSourceProperty, binding);
+            SetBinding(TasksProperty, binding);
 
             binding = new Binding("SelectedItem");
             binding.Source = model;
@@ -29,9 +29,9 @@ namespace FileManipulator.UI
 
         #region Fields
 
-        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
-            "ItemsSource",
-            typeof(ICollection<Task>),
+        public static readonly DependencyProperty TasksProperty = DependencyProperty.Register(
+            "Tasks",
+            typeof(ObservableCollection<Task>),
             typeof(TasksView));
 
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(
@@ -44,10 +44,10 @@ namespace FileManipulator.UI
 
         #region Properties
 
-        public ICollection<Task> ItemsSource
+        public ObservableCollection<Task> Tasks
         {
-            get => GetValue(ItemsSourceProperty) as ICollection<Task>;
-            set => SetValue(ItemsSourceProperty, value);
+            get => GetValue(TasksProperty) as ObservableCollection<Task>;
+            set => SetValue(TasksProperty, value);
         }
 
         public Task SelectedItem

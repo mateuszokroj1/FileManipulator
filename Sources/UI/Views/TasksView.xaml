@@ -28,64 +28,33 @@
             <local:TasksViewTemplateSelector.UndefinedTemplate>
                 <DataTemplate>
                     <Grid>
-                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">Wybierz poprawne zadanie</Label>
+                        <Label HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               HorizontalContentAlignment="Center"
+                               VerticalContentAlignment="Center">
+                            Wybierz poprawne zadanie
+                        </Label>
                     </Grid>
                 </DataTemplate>
             </local:TasksViewTemplateSelector.UndefinedTemplate>
         </local:TasksViewTemplateSelector>
     </UserControl.Resources>
     <Grid>
-        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}" SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}" ItemTemplateSelector="{StaticResource TemplateSelector}">
-            <TabControl.ItemContainerStyle>
-                <Style TargetType="TabItem">
-                    <Setter Property="Header" Value="{Binding Name}" />
-                </Style>
-            </TabControl.ItemContainerStyle>
-            <TabControl.Resources>
-                <Style TargetType="TabItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="TabItem">
-                                <Border BorderThickness="1" BorderBrush="#ccc">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="{TemplateBinding Header}" />
-                                        <Button Width="20" Height="20">x</Button>
-                                    </Grid>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </TabControl.Resources>
+        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}"
+                    SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}"
+                    ContentTemplateSelector="{StaticResource TemplateSelector}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="25" />
+                        </Grid.ColumnDefinitions>
+                        <Label Content="{Binding Name}" Grid.Column="0" />
+                        <Button FontFamily="Webdings" FontSize="10" Grid.Column="1" Width="20" Height="20" Command="{Binding CloseCommand}">r<!-- Close sign in Webdings font --></Button>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
         </TabControl>
-        <Button Content="+" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
-            <Button.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Watcher" Command="{Binding CreateNewWatcherCommand}" />
-                    <MenuItem Header="Manipulator" Command="{Binding CreateNewManipulatorCommand}" />
-                </ContextMenu>
-            </Button.ContextMenu>
-            <Button.Style>
-                <Style TargetType="{x:Type Button}">
-                    <Style.Triggers>
-                        <EventTrigger RoutedEvent="Click">
-                            <EventTrigger.Actions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
-                                            <DiscreteBooleanKeyFrame KeyTime="0:0:0" Value="True" />
-                                        </BooleanAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger.Actions>
-                        </EventTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
     </Grid>
 </UserControl>

@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using FileManipulator.Models.Watcher;
+using FileManipulator.Models.Manipulator;
 
 namespace FileManipulator
 {
@@ -21,14 +23,7 @@ namespace FileManipulator
         public TaskDefaultNameGenerator(IEnumerable<Task> tasks)
         {
             Tasks = tasks ?? throw new ArgumentNullException(nameof(tasks));
-            this.taskType = typeof(TTask);
         }
-
-        #endregion
-
-        #region Fields
-
-        private readonly Type taskType;
 
         #endregion
 
@@ -42,18 +37,31 @@ namespace FileManipulator
 
         public string Generate()
         {
-            /*if(this.taskType == typeof(WatcherTask))
+            if (typeof(TTask) == typeof(Watcher))
             {
                 var regex = new Regex(@"^Watcher(\d+)$");
-                var searched = Tasks
+
+                var searchedValues = Tasks
                     ?.Where(task =>
-                        task is WatcherTask &&
+                        task is Watcher &&
                         !string.IsNullOrEmpty(task.Name))
                     .Select(task => regex.Match(task.Name))
                     .Where(match => match.Success)
-                    .Select(match => );
-            }*/
-            throw new NotImplementedException();
+                    .Select(match => match.Groups[1].Captures[0].Value)
+                    .Select(val => int.Parse(val));
+
+                int maxSearchedValue = searchedValues.Count() > 0 ? searchedValues.Max() : 0;
+                ++maxSearchedValue;
+
+                return $"Watcher{maxSearchedValue}";
+            }
+            else
+                if (typeof(TTask) == typeof(Manipulator))
+            {
+                throw new NotImplementedException();
+            }
+            else
+                throw new InvalidOperationException("Not implemented for this type.");
         }
 
         #endregion

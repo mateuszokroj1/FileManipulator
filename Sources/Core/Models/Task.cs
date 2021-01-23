@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Subjects;
 
@@ -92,6 +94,11 @@ namespace FileManipulator
         /// Resets state of task
         /// </summary>
         public abstract STT.Task ResetAsync();
+
+        public virtual void Close(ICollection<Task> collection)
+        {
+            collection.Remove(this);
+        }
 
         public abstract void Dispose();
 

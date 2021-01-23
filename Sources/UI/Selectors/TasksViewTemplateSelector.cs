@@ -1,6 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
+using FileManipulator.Models.Manipulator;
+using FileManipulator.Models.Watcher;
+
 namespace FileManipulator.UI
 {
     public class TasksViewTemplateSelector : DataTemplateSelector
