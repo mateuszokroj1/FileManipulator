@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows.Input;
 
 using STT = System.Threading.Tasks;
@@ -21,26 +22,19 @@ namespace FileManipulator.Models.Watcher
             var generator = new TaskDefaultNameGenerator<Watcher>(tasks);
             Name = generator.Generate();
             ResetAsync().Wait();
-            State = TaskState.Ready;
 
             this.pathObserver =
             Observable.FromEventPattern(this, "PropertyChanged")
             .Select(args => (args.EventArgs as PropertyChangedEventArgs)?.PropertyName)
             .Where(propertyName => propertyName == nameof(Path))
             .Where(p => State != TaskState.Working && State != TaskState.Paused)
-            .Subscribe(p =>
+            .Subscribe(async p =>
                 {
                     this.watcher.Dispose();
 
                     if (CheckPathIsValid(Path))
                     {
-                        this.watcher = new FileSystemWatcher(Path)
-                        {
-                            EnableRaisingEvents = false,
-                            IncludeSubdirectories = true
-                        };
-
-                        ConfigureNewWatcher();
+                        await ResetAsync();
                     }
 
                     OnPropertyChanged(nameof(IncludeSubdirectories));
@@ -57,6 +51,7 @@ namespace FileManipulator.Models.Watcher
         private FileSystemWatcher watcher;
         private readonly IDisposable pathObserver;
         private readonly ICollection<Task> tasksCollection;
+        private readonly IDisposable[] watcherObservers = new IDisposable[5];
         
         #endregion
 
@@ -82,6 +77,8 @@ namespace FileManipulator.Models.Watcher
         }
 
         public bool CanPause => State == TaskState.Working;
+
+        public SynchronizationContext SynchronizationContext { get; set; } = SynchronizationContext.Current;
 
         public bool CanStop => State == TaskState.Working || State == TaskState.Paused;
 
@@ -109,6 +106,9 @@ namespace FileManipulator.Models.Watcher
 
         public override async STT.Task ResetAsync()
         {
+            foreach (var observer in this.watcherObservers)
+                observer?.Dispose();
+
             this.watcher?.Dispose();
             this.watcher = null;
 
@@ -118,10 +118,15 @@ namespace FileManipulator.Models.Watcher
                 Stopped.OnNext(new TaskEventArgs(this));
             }
 
-            State = TaskState.Ready;
+            ConfigureNewWatcher();
 
-            Actions.Clear();
-            Progress.Report(0, Messages.ReadyState);
+            SynchronizationContext.Send(state =>
+            {
+                State = TaskState.Ready;
+
+                Actions.Clear();
+                Progress.Report(0, Messages.ReadyState);
+            }, null);
         }
 
         public override async STT.Task StartAsync()
@@ -139,17 +144,21 @@ namespace FileManipulator.Models.Watcher
             }
             catch(Exception exc)
             {
-                LastError = exc;
-                State = TaskState.Error;
-                Error.OnNext(new TaskErrorEventArgs(exc, this));
-                this.watcher?.Dispose();
-                this.watcher = null;
+                SynchronizationContext.Send(state =>
+                {
+                    LastError = exc;
+                    State = TaskState.Error;
+                    Error.OnNext(new TaskErrorEventArgs(exc, this));
+                    this.watcher?.Dispose();
+                    this.watcher = null;
+                }, null);
+                
                 return;
             }
 
             Started.OnNext(new TaskEventArgs(this));
 
-            State = TaskState.Working;
+            SynchronizationContext.Send(state => State = TaskState.Working, null);
         }
 
         public override async STT.Task StopAsync()
@@ -162,7 +171,7 @@ namespace FileManipulator.Models.Watcher
 
             Stopped.OnNext(new TaskEventArgs(this));
 
-            State = TaskState.Stopped;
+            SynchronizationContext.Send(state => State = TaskState.Stopped, null);
         }
 
         private void SetLastError(Exception exception)
@@ -176,61 +185,71 @@ namespace FileManipulator.Models.Watcher
 
         private void ConfigureNewWatcher()
         {
-            Observable.FromEventPattern<ErrorEventHandler, ErrorEventArgs>(
+            this.watcherObservers[0] = Observable.FromEventPattern<ErrorEventHandler, ErrorEventArgs>(
                 handler => this.watcher.Error += handler,
                 handler => this.watcher.Error -= handler
             )
+            .ObserveOn(SynchronizationContext)
             .Subscribe(args => SetLastError(args.EventArgs.GetException()));
 
-            Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+            this.watcherObservers[1] = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
                 handler => this.watcher.Created += handler,
                 handler => this.watcher.Created -= handler
             )
+            .ObserveOn(SynchronizationContext)
             .Subscribe(args => Actions.Add(new ChangeWatcherAction
             {
                 ChangeType = ChangeType.Created,
                 Path = args.EventArgs.FullPath
             }));
 
-            Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+            this.watcherObservers[2] = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
                 handler => this.watcher.Changed += handler,
                 handler => this.watcher.Changed -= handler
             )
+            .ObserveOn(SynchronizationContext)
             .Subscribe(args => Actions.Add(new ChangeWatcherAction
             {
                 ChangeType = ChangeType.Modified,
                 Path = args.EventArgs.FullPath
             }));
 
-            Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+            this.watcherObservers[3] = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
                 handler => this.watcher.Deleted += handler,
                 handler => this.watcher.Deleted -= handler
             )
+            .ObserveOn(SynchronizationContext)
             .Subscribe(args => Actions.Add(new ChangeWatcherAction
             {
                 ChangeType = ChangeType.Deleted,
                 Path = args.EventArgs.FullPath
             }));
 
-            Observable.FromEventPattern<RenamedEventHandler, RenamedEventArgs>(
+            this.watcherObservers[4] = Observable.FromEventPattern<RenamedEventHandler, RenamedEventArgs>(
                 handler => this.watcher.Renamed += handler,
                 handler => this.watcher.Renamed -= handler
             )
+            .ObserveOn(SynchronizationContext)
             .Subscribe(args => Actions.Add(new RenameWatcherAction
-        {
+            {
                 DestinationPath = args.EventArgs.FullPath,
                 Path = args.EventArgs.OldFullPath
             }));
         }
 
-        public void Close()
+        public async void Close()
         {
+            await StopAsync();
             base.Close(this.tasksCollection);
         }
 
         public override void Dispose()
         {
             this.pathObserver?.Dispose();
+
+            foreach (var observer in this.watcherObservers)
+                observer?.Dispose();
+
             this.watcher?.Dispose();
         }
 
