@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -20,9 +22,10 @@ namespace FileManipulator.UI
         {
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());
             CreateNewManipulatorTaskCommand = new Command(() => CreateNew<Manipulator>());
+            HelpCommand = new Command(() => Process.Start(Path.Combine(Environment.CurrentDirectory, "Pomoc.docx")));
             EditTaskNameCommand = new ReactiveCommand(
                 Observable.FromEventPattern(this, "PropertyChanged")
-                .Select(args => (args.EventArgs as PropertyChangedEventArgs)?.PropertyName)
+                .Select(args => (args.EventArgs as PropertyChangedEventArgs).PropertyName)
                 .Where(name => name == nameof(SelectedTask))
                 .Select(name => SelectedTask != null),
                 () => EditTaskName());
@@ -56,6 +59,8 @@ namespace FileManipulator.UI
         public ICommand CreateNewManipulatorTaskCommand { get; }
 
         public ICommand EditTaskNameCommand { get; }
+
+        public ICommand HelpCommand { get; }
 
         #endregion
 

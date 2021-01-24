@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace FileManipulator.UI
 {
@@ -7,7 +8,13 @@ namespace FileManipulator.UI
         public MainView()
         {
             InitializeComponent();
+            SetValue(CloseCommandProperty, new Command(() => Close()));
         }
+
+        public static readonly DependencyPropertyKey CloseCommandProperty = DependencyProperty.RegisterReadOnly(
+            "CloseCommand",
+            typeof(ICommand),
+            typeof(MainView), new PropertyMetadata());
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
