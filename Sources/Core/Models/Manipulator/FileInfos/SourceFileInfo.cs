@@ -2,7 +2,7 @@
 
 namespace FileManipulator.Models.Manipulator.FileInfos
 {
-    public class SourceFileInfo : ISourceFileInfo
+    public class ISourceFileInfo : ISourceFileInfo
     {
         public string SourceFileName { get; internal set; }
 
