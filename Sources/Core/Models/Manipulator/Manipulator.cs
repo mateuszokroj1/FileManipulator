@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using FileManipulator.Models.Manipulator;
@@ -21,6 +22,8 @@ namespace FileManipulator.Models.Manipulator
         {
             var generator = new TaskDefaultNameGenerator<Manipulator>(tasks);
             Name = generator.Generate();
+
+            ResetAsync().Wait();
         }
 
         #endregion
@@ -28,6 +31,8 @@ namespace FileManipulator.Models.Manipulator
         #region Properties
 
         public IEnumerable<string> FilePaths { get; set; }
+
+        public SynchronizationContext SynchronizationContext { get; set; } = SynchronizationContext.Current;
 
         public ObservableCollection<IFilter> Filters { get; } = new ObservableCollection<IFilter>();
 
@@ -91,9 +96,22 @@ namespace FileManipulator.Models.Manipulator
             throw new System.NotImplementedException();
         }
 
-        public override STT.Task ResetAsync()
+        public async override STT.Task ResetAsync()
         {
-            throw new System.NotImplementedException();
+            SynchronizationContext.Send(async state =>
+            {
+                if(State == TaskState.Working || State == TaskState.Paused)
+                {
+                    Stopping.OnNext(new TaskEventArgs(this));
+                    await StopAsync();
+                    Stopped.OnNext(new TaskEventArgs(this));
+
+                    State = TaskState.Ready;
+                    LastError = null;
+                }
+
+                
+            }, null);
         }
 
         public override STT.Task StartAsync()
@@ -108,7 +126,7 @@ namespace FileManipulator.Models.Manipulator
 
         public override void Dispose()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         #endregion

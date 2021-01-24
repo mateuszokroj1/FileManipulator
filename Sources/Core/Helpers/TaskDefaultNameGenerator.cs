@@ -58,10 +58,28 @@ namespace FileManipulator
             else
                 if (typeof(TTask) == typeof(Manipulator))
             {
-                throw new NotImplementedException();
+                var maxSearchedValue = MaxSearchedValueFor(new Regex(@"^Manipulator(\d+)$"));
+                
+                ++maxSearchedValue;
+
+                return $"Manipulator{maxSearchedValue}";
             }
             else
                 throw new InvalidOperationException("Not implemented for this type.");
+        }
+
+        private int MaxSearchedValueFor(Regex searchedRegex)
+        {
+            var searchedValues = Tasks
+                    ?.Where(task =>
+                        task is Watcher &&
+                        !string.IsNullOrEmpty(task.Name))
+                    .Select(task => searchedRegex.Match(task.Name))
+                    .Where(match => match.Success)
+                    .Select(match => match.Groups[1].Captures[0].Value)
+                    .Select(val => int.Parse(val));
+
+            return searchedValues.Count() > 0 ? searchedValues.Max() : 0;
         }
 
         #endregion
