@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace FileManipulator.Models.Manipulator
 
         #region Methods
 
-        private async Task<IEnumerable<IDestinationFileInfo>> FilterFilesAsync()
+        private async Task<IEnumerable<IDestinationFileInfo>> FilterFilesAsync(CancellationToken cancellationToken)
         {
             if (FilePaths == null)
                 return null;
@@ -55,50 +56,80 @@ namespace FileManipulator.Models.Manipulator
             if (FilePaths.Count() < 1)
                 return Enumerable.Empty<IDestinationFileInfo>();
 
-            foreach (var filter in Filters)
-                filter.State = SubTaskState.Pending;
+            cancellationToken.ThrowIfCancellationRequested();
 
-            var sourceFileInfos = FilePaths
-                .Select(path =>
-                {
-                    var info = new SourceFileInfo
+            SynchronizationContext.Send(state =>
+            {
+                foreach (var filter in Filters)
+                    filter.State = SubTaskState.Pending;
+            }, null);
+
+            IEnumerable<ISourceFileInfo> sourceFileInfos = null;
+
+            try
+            {
+                sourceFileInfos = FilePaths
+                    .Select(path =>
                     {
-                        SourceFileName = path,
-                        SourceFileContent = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)),
-                    };
+                        cancellationToken.ThrowIfCancellationRequested();
 
-                    info.IsTextFile = new TextFileIdentifier(info.SourceFileContent.BaseStream).Check();
+                        var info = new ISourceFileInfo
+                        {
+                            SourceFileName = path,
+                            SourceFileContent = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)),
+                        };
 
-                    return info;
-                });
+                        info.IsTextFile = new TextFileIdentifier(info.SourceFileContent.BaseStream).Check();
 
-            foreach (var filter in Filters)
-                if (filter is INameFilter)
-                {
-                    filter.State = SubTaskState.Working;
-                    sourceFileInfos = await filter.Filter(sourceFileInfos);
-                    filter.State = SubTaskState.Done;
-                }
+                        return info;
+                    });
 
-            foreach (var filter in Filters)
-                if (filter is IContentFilter)
-                {
-                    filter.State = SubTaskState.Working;
-                    sourceFileInfos = await filter.Filter(sourceFileInfos);
-                    filter.State = SubTaskState.Done;
-                }
+                cancellationToken.ThrowIfCancellationRequested();
+
+                foreach (var filter in Filters)
+                    if (filter is INameFilter)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        SynchronizationContext.Send(state => filter.State = SubTaskState.Working, null);
+                        sourceFileInfos = await filter.Filter(sourceFileInfos);
+                        SynchronizationContext.Send(state => filter.State = SubTaskState.Done, null);
+                    }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                foreach (var filter in Filters)
+                    if (filter is IContentFilter)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        SynchronizationContext.Send(state => filter.State = SubTaskState.Working, null);
+                        sourceFileInfos = await filter.Filter(sourceFileInfos);
+                        SynchronizationContext.Send(state => filter.State = SubTaskState.Done, null);
+                    }
+            }
+            catch(OperationCanceledException)
+            {
+                if(sourceFileInfos != null)
+                    foreach(var fileInfo in sourceFileInfos)
+                    {
+
+                    }
+
+                throw;
+            }
 
             return sourceFileInfos.Select(info => new DestinationFileInfo(info));
         }
 
-        private async STT.Task ManipulateFilesAsync()
+        private async STT.Task ManipulateFilesAsync(IEnumerable<IDestinationFileInfo> files, CancellationToken cancellationToken)
         {
-            //TODO
+            
         }
 
         public override STT.Task PauseAsync()
         {
-            throw new System.NotImplementedException();
+            throw new InvalidOperationException();
         }
 
         public async override STT.Task ResetAsync()
@@ -117,19 +148,49 @@ namespace FileManipulator.Models.Manipulator
             }, null);
 
             this.cancellationTokenSource = new CancellationTokenSource();
-
         }
 
         public async override STT.Task StartAsync()
         {
             var cancelToken = this.cancellationTokenSource.Token;
 
-            
+            if (FilePaths?.Count() < 1 || Filters.Count < 1 && Manipulations.Count < 1)
+                return;
+
+            try
+            {
+                cancelToken.ThrowIfCancellationRequested();
+
+                var destinationFilesInfos = await FilterFilesAsync(cancelToken);
+
+                await ManipulateFilesAsync(destinationFilesInfos, cancelToken);
+            }
+            catch(OperationCanceledException)
+            {
+                Stopped.OnNext(new TaskEventArgs(this));
+            }
+            catch(Exception exc)
+            {
+                SynchronizationContext.Send(state =>
+                {
+                    State = TaskState.Error;
+                    LastError = exc;
+                }, null);
+                Error.OnNext(new TaskErrorEventArgs(exc, this));
+            }
+            finally
+            {
+
+            }
         }
 
-        public override STT.Task StopAsync()
+        public async override STT.Task StopAsync()
         {
-            throw new System.NotImplementedException();
+            if(State == TaskState.Working || State == TaskState.Paused)
+            {
+                Stopping.OnNext(new TaskEventArgs(this));
+                this.cancellationTokenSource.Cancel();
+            }
         }
 
         public override void Dispose()

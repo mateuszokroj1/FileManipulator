@@ -251,6 +251,14 @@ namespace FileManipulator.Models.Watcher
                 observer?.Dispose();
 
             this.watcher?.Dispose();
+
+            Starting.OnCompleted();
+            Started.OnCompleted();
+            Pausing.OnCompleted();
+            Paused.OnCompleted();
+            Error.OnCompleted();
+            Stopping.OnCompleted();
+            Stopped.OnCompleted();
         }
 
         public static bool CheckPathIsValid(string path) =>
