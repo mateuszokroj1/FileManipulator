@@ -30,8 +30,8 @@
                 <Separator/>
                 <MenuItem Header="Otwórz bibliotekę zadań..." />
             </MenuItem>
-            <MenuItem Header="Pomoc"  />
-            <MenuItem Header="Zamknij aplikację" Command="{x:Static ApplicationCommands.Close}" />
+            <MenuItem Header="Pomoc" Command="{Binding HelpCommand}" />
+            <MenuItem Header="Zamknij aplikację" Command="{Binding CloseCommand, ElementName=Window}" />
         </Menu>
         <local:TasksView Grid.Row="1" DataContext="{Binding DataContext, ElementName=Window}" Tasks="{Binding Tasks, Mode=OneWay}" SelectedItem="{Binding SelectedTask, Mode=TwoWay}" />
     </Grid>

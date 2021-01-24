@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Manipulator.FileInfos;
 using FileManipulator.Models.Manipulator.Filters;
 using FileManipulator.Models.Manipulator.Manipulations;
@@ -25,6 +24,12 @@ namespace FileManipulator.Models.Manipulator
 
             ResetAsync().Wait();
         }
+
+        #endregion
+
+        #region Fields
+
+        private CancellationTokenSource cancellationTokenSource;
 
         #endregion
 
@@ -109,14 +114,17 @@ namespace FileManipulator.Models.Manipulator
                     State = TaskState.Ready;
                     LastError = null;
                 }
-
-                
             }, null);
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+
         }
 
-        public override STT.Task StartAsync()
+        public async override STT.Task StartAsync()
         {
-            throw new System.NotImplementedException();
+            var cancelToken = this.cancellationTokenSource.Token;
+
+            
         }
 
         public override STT.Task StopAsync()
