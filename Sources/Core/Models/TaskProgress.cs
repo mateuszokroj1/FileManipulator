@@ -11,12 +11,12 @@ namespace FileManipulator
         public TaskProgress()
         {
             OnValueChanged =
-                PropertyChangedObservable
+                this.propertyChangedObservable
                 .Where(propertyName => propertyName == nameof(ProgressValue))
                 .Select(p => ProgressValue);
 
             OnStatusChanged =
-                PropertyChangedObservable
+                this.propertyChangedObservable
                 .Where(propertyName => propertyName == nameof(Status))
                 .Select(p => Status);
         }
@@ -27,6 +27,8 @@ namespace FileManipulator
 
         private float progressValue;
         private string status;
+
+        private readonly IObservable<string> propertyChangedObservable;
 
         #endregion
 

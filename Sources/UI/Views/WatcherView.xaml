@@ -4,9 +4,38 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManipulator.UI"
-             mc:Ignorable="d" 
+             xmlns:viewmodels="clr-namespace:FileManipulator.ViewModels;assembly=FileManipulator.Core"
+             mc:Ignorable="d"
+             x:Name="Root"
+             Background="{x:Static SystemColors.ControlBrush}"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <viewmodels:WatcherViewModel Watcher="{Binding Watcher, ElementName=Root, Mode=OneWay}" />
+    </UserControl.DataContext>
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <GroupBox Header="Rodzaj ścieżki">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="Folder" IsChecked="{Binding}" />
+                    <RadioButton Content="Plik" />
+                </StackPanel>
+            </GroupBox>
+            <TextBox Text="{Binding }" />
+            <Button>Przeglądaj...</Button>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Button>Start</Button>
+            <CheckBox Content="Dołączaj podfoldery" />
+            <Button>Stop</Button>
+            <Button>Wyczyść</Button>
+        </Grid>
+        <ListView Grid.Row="2">
+
+        </ListView>
     </Grid>
 </UserControl>

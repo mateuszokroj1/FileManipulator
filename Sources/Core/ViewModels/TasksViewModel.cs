@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-
-using FileManipulator.Models.Manipulator;
-using FileManipulator.Models.Watcher;
+﻿using System.Collections.ObjectModel;
 
 namespace FileManipulator
 {
-    public class TasksViewModel : ModelBase
+    public class TasksViewModel : ModelBase, ITasksViewModel
     {
         #region Constructor
 

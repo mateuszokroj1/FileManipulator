@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using FileManipulator.Models.Watcher;
+
 namespace FileManipulator.UI
 {
     /// <summary>
@@ -23,6 +25,19 @@ namespace FileManipulator.UI
         public WatcherView()
         {
             InitializeComponent();
+
+            
+        }
+
+        public static readonly DependencyProperty WatcherProperty = DependencyProperty.Register(
+            "Watcher",
+            typeof(Watcher),
+            typeof(WatcherView));
+
+        public Watcher Watcher
+        {
+            get => GetValue(WatcherProperty) as Watcher;
+            set => SetValue(WatcherProperty, value);
         }
     }
 }

@@ -9,19 +9,6 @@ namespace FileManipulator
     {
         #region Constructor
 
-        protected ModelBase()
-        {
-            PropertyChangedObservable =
-                Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangingEventArgs>
-                (
-                    handler => PropertyChanged += handler,
-                    handler => PropertyChanged -= handler
-                )
-                .Where(args => !string.IsNullOrWhiteSpace(args?.EventArgs?.PropertyName))
-                .Select(args => args.EventArgs.PropertyName);
-                
-        }
-
         #endregion
 
         #region Fields
@@ -31,8 +18,6 @@ namespace FileManipulator
         #endregion
 
         #region Properties
-
-        public IObservable<string> PropertyChangedObservable { get; }
 
         #endregion
 
