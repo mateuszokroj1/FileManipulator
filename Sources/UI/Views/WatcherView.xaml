@@ -9,33 +9,59 @@
              x:Name="Root"
              Background="{x:Static SystemColors.ControlBrush}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <viewmodels:WatcherViewModel Watcher="{Binding Watcher, ElementName=Root, Mode=OneWay}" />
-    </UserControl.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid>
-            <GroupBox Header="Rodzaj ścieżki">
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="Folder" IsChecked="{Binding}" />
-                    <RadioButton Content="Plik" />
-                </StackPanel>
-            </GroupBox>
-            <TextBox Text="{Binding }" />
-            <Button>Przeglądaj...</Button>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Margin="5" Header="Rodzaj ścieżki">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="DirectoryCheckbox" Content="Folder" Margin="5,5,0,5" IsChecked="{Binding IsDirectoryPath, Mode=TwoWay}" />
+                        <RadioButton Content="Plik" Margin="30,5,0,5" />
+                    </StackPanel>
+                </GroupBox>
+                <CheckBox Grid.Column="1" IsChecked="{Binding IncludeSubdirectories, Mode=TwoWay}" IsEnabled="{Binding IsChecked, Mode=OneWay, ElementName=DirectoryCheckbox}" Margin="10" Content="Dołączaj podfoldery" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" x:Name="PathTextbox" FontSize="13" VerticalAlignment="Center" Margin="5" Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Command="{Binding BrowseCommand}" Grid.Column="1" IsEnabled="{Binding IsEnabled, Mode=OneWay, ElementName=PathTextbox}" Margin="10" Padding="5">Przeglądaj...</Button>
+            </Grid>
         </Grid>
         <Grid Grid.Row="1">
-            <Button>Start</Button>
-            <CheckBox Content="Dołączaj podfoldery" />
-            <Button>Stop</Button>
-            <Button>Wyczyść</Button>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding StartCommand}" Grid.Column="0" HorizontalAlignment="Center" Padding="20,5,20,5" Margin="10">Start</Button>
+            <Button Command="{Binding StopCommand}" Grid.Column="1" HorizontalAlignment="Center" Padding="10,5,10,5" Margin="10">Stop</Button>
+            <Button Command="{Binding ClearCommand}" Grid.Column="2" HorizontalAlignment="Center" Padding="10,5,10,5" Margin="10">Wyczyść</Button>
         </Grid>
-        <ListView Grid.Row="2">
-
+        <ListView Grid.Row="2" ItemsSource="{Binding Actions}">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Ścieżka" Width="Auto" DisplayMemberBinding="{Binding Path}" />
+                        <GridViewColumn Header="Czas akcji" Width="Auto" DisplayMemberBinding="{Binding Time}" />
+                        <GridViewColumn Header="Typ akcji" Width="Auto" DisplayMemberBinding="{Binding ActionType}" />
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
         </ListView>
     </Grid>
 </UserControl>

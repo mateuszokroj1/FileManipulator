@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using FileManipulator.Models.Watcher;
+using FileManipulator.ViewModels;
 
 namespace FileManipulator.UI
 {
@@ -26,7 +27,7 @@ namespace FileManipulator.UI
         {
             InitializeComponent();
 
-            
+            DataContext = new WatcherViewModel(Watcher);
         }
 
         public static readonly DependencyProperty WatcherProperty = DependencyProperty.Register(
