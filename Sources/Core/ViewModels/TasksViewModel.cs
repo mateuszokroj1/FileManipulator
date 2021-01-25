@@ -13,8 +13,6 @@ namespace FileManipulator
 
         public TasksViewModel()
         {
-            CreateNewWatcherCommand = new Command(() => CreateNew<Watcher>());
-            CreateNewManipulatorCommand = new Command(() => CreateNew<Manipulator>());
         }
 
         #endregion
@@ -40,35 +38,9 @@ namespace FileManipulator
             set => SetProperty(ref this.selectedItem, value);
         }
 
-        public ICommand CreateNewWatcherCommand { get; }
-
-        public ICommand CreateNewManipulatorCommand { get; }
-
         #endregion
 
         #region Methods
-
-        public void CreateNew<TaskType>()
-            where TaskType : Task
-        {
-            if (Tasks == null || Tasks.Count > 100)
-                return;
-
-            Task newTask;
-            if (typeof(TaskType) == typeof(Watcher))
-            {
-                newTask = new Watcher(Tasks);
-            }
-            else if (typeof(TaskType) == typeof(Manipulator))
-            {
-                newTask = new Manipulator(Tasks);
-            }
-            else
-                throw new InvalidOperationException("Invalid task type.");
-
-            Tasks.Add(newTask);
-            SelectedItem = newTask;
-        }
 
         #endregion
     }

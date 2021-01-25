@@ -9,6 +9,11 @@ namespace FileManipulator.UI
         {
             InitializeComponent();
             SetValue(CloseCommandProperty, new Command(() => Close()));
+
+            var model = DataContext as MainViewModel;
+
+            model.MessageOnCloseWhileTaskWorking = () =>//TODO
+                MessageBox.Show("", "", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
         }
 
         public static readonly DependencyPropertyKey CloseCommandProperty = DependencyProperty.RegisterReadOnly(
