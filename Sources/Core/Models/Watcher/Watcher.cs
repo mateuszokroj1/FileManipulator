@@ -15,7 +15,7 @@ namespace FileManipulator.Models.Watcher
     {
         #region Constructor
 
-        public Watcher(ICollection<Task> tasks)
+        public Watcher(ICollection<ITask> tasks)
         {
             this.tasksCollection = tasks ?? throw new ArgumentNullException(nameof(tasks));
 
@@ -50,7 +50,7 @@ namespace FileManipulator.Models.Watcher
         private string path;
         private FileSystemWatcher watcher;
         private readonly IDisposable pathObserver;
-        private readonly ICollection<Task> tasksCollection;
+        private readonly ICollection<ITask> tasksCollection;
         private readonly IDisposable[] watcherObservers = new IDisposable[5];
         
         #endregion
@@ -60,7 +60,7 @@ namespace FileManipulator.Models.Watcher
         public string Path
         {
             get => this.path;
-            set => SetProperty(ref this.path, value);
+            set => SetProperty(ref this.path, value, nameof(Path), nameof(CanStart));
         }
 
         public bool IncludeSubdirectories
@@ -82,11 +82,9 @@ namespace FileManipulator.Models.Watcher
 
         public bool CanStop => State == TaskState.Working || State == TaskState.Paused;
 
-        public bool CanStart => State == TaskState.Stopped || State == TaskState.Ready;
+        public bool CanStart => (State == TaskState.Stopped || State == TaskState.Ready) && CheckPathIsValid(Path);
 
         public ObservableCollection<WatcherAction> Actions { get; } = new ObservableCollection<WatcherAction>();
-
-        public ICommand CloseCommand { get; }
 
         #endregion
 
@@ -106,6 +104,11 @@ namespace FileManipulator.Models.Watcher
 
         public override async STT.Task ResetAsync()
         {
+            foreach (var observer in this.watcherObservers)
+                observer?.Dispose();
+
+            this.watcher.EnableRaisingEvents = false;
+
             foreach (var observer in this.watcherObservers)
                 observer?.Dispose();
 
@@ -185,6 +188,24 @@ namespace FileManipulator.Models.Watcher
 
         private void ConfigureNewWatcher()
         {
+            if (string.IsNullOrEmpty(Path))
+                return;
+
+            try
+            {
+                this.watcher = new FileSystemWatcher(Path);
+            }
+            catch(Exception exc)
+            {
+                SynchronizationContext.Send(state =>
+                {
+                    LastError = exc;
+                    State = TaskState.Error;
+                }, null);
+
+                Error.OnNext(new TaskErrorEventArgs(exc, this));
+            }
+
             this.watcherObservers[0] = Observable.FromEventPattern<ErrorEventHandler, ErrorEventArgs>(
                 handler => this.watcher.Error += handler,
                 handler => this.watcher.Error -= handler
@@ -235,6 +256,8 @@ namespace FileManipulator.Models.Watcher
                 DestinationPath = args.EventArgs.FullPath,
                 Path = args.EventArgs.OldFullPath
             }));
+
+            OnPropertyChanged(nameof(IncludeSubdirectories));
         }
 
         public async void Close()

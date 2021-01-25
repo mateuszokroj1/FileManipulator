@@ -8,6 +8,6 @@ namespace FileManipulator.Models.Manipulator.Manipulations
 {
     public interface IManipulation : INotifyPropertyChanged, ISubTask
     {
-        Task<IEnumerable<IDestinationFileInfo>> Manipulate(IEnumerable<IDestinationFileInfo> inputFiles);
+        Task<IEnumerable<IDestinationFileInfo>> ManipulateAsync(IEnumerable<IDestinationFileInfo> inputFiles);
     }
 }

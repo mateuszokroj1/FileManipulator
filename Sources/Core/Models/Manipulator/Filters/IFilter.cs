@@ -8,6 +8,6 @@ namespace FileManipulator.Models.Manipulator.Filters
 {
     public interface IFilter : INotifyPropertyChanged, ISubTask
     {
-        Task<IEnumerable<ISourceFileInfo>> Filter(IEnumerable<ISourceFileInfo> inputList);
+        Task<IEnumerable<ISourceFileInfo>> FilterAsync(IEnumerable<ISourceFileInfo> inputList);
     }
 }

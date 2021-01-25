@@ -21,20 +21,20 @@ namespace FileManipulator
 
         #region Fields
 
-        private ObservableCollection<Task> tasks;
-        private Task selectedItem;
+        private ObservableCollection<ITask> tasks;
+        private ITask selectedItem;
 
         #endregion
 
         #region Properties
 
-        public ObservableCollection<Task> Tasks
+        public ObservableCollection<ITask> Tasks
         {
             get => this.tasks;
             set => SetProperty(ref this.tasks, value);
         }
 
-        public Task SelectedItem
+        public ITask SelectedItem
         {
             get => this.selectedItem;
             set => SetProperty(ref this.selectedItem, value);
