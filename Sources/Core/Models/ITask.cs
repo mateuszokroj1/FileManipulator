@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Input;
 
 using STT = System.Threading.Tasks;
 
@@ -18,6 +19,7 @@ namespace FileManipulator
         Guid Id { get; }
 
         Exception LastError { get; set; }
+        ICommand CloseCommand { get; }
 
         #endregion
 

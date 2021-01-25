@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 
 using STT = System.Threading.Tasks;
 
@@ -35,6 +36,8 @@ namespace FileManipulator
         public Subject<TaskErrorEventArgs> Error { get; } = new Subject<TaskErrorEventArgs>();
 
         public Subject<TaskEventArgs> Completed { get; } = new Subject<TaskEventArgs>();
+
+        public ICommand CloseCommand { get; protected set; }
 
         /// <summary>
         /// Actual task state
@@ -95,7 +98,7 @@ namespace FileManipulator
         /// </summary>
         public abstract STT.Task ResetAsync();
 
-        public virtual void Close(ICollection<Task> collection)
+        public virtual void Close(ICollection<ITask> collection)
         {
             collection.Remove(this);
         }

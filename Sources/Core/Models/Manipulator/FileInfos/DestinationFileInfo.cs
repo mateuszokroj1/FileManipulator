@@ -1,6 +1,6 @@
 ﻿namespace FileManipulator.Models.Manipulator.FileInfos
 {
-    public class DestinationFileInfo : ISourceFileInfo, ISourceFileInfo, IDestinationFileInfo
+    public class DestinationFileInfo : SourceFileInfo, IDestinationFileInfo
     {
         public DestinationFileInfo() { }
 

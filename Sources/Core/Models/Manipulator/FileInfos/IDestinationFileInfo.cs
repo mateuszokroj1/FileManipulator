@@ -1,6 +1,6 @@
 ﻿namespace FileManipulator.Models.Manipulator.FileInfos
 {
-    public interface IDestinationFileInfo
+    public interface IDestinationFileInfo : ISourceFileInfo
     {
         string DestinationFileName { get; set; }
 

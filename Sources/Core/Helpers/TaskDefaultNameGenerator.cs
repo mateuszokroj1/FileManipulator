@@ -20,7 +20,7 @@ namespace FileManipulator
         /// Creates new instance of <see cref="TaskDefaultNameGenerator{TTask}"/>.
         /// </summary>
         /// <param name="tasks">Collection of created tasks</param>
-        public TaskDefaultNameGenerator(IEnumerable<Task> tasks)
+        public TaskDefaultNameGenerator(IEnumerable<ITask> tasks)
         {
             Tasks = tasks ?? throw new ArgumentNullException(nameof(tasks));
         }
@@ -29,7 +29,7 @@ namespace FileManipulator
 
         #region Properties
 
-        public IEnumerable<Task> Tasks { get; set; }
+        public IEnumerable<ITask> Tasks { get; set; }
 
         #endregion
 

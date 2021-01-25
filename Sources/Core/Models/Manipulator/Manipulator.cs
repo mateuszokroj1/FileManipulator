@@ -18,12 +18,17 @@ namespace FileManipulator.Models.Manipulator
     {
         #region Constructor
 
-        public Manipulator(IEnumerable<Task> tasks)
+        public Manipulator(ICollection<ITask> tasks, Func<bool> onCloseWhileWorking)
         {
+            this.tasks = tasks ?? throw new ArgumentNullException(nameof(tasks));
+            this.onCloseWhileWorking = onCloseWhileWorking ?? throw new ArgumentNullException(nameof(onCloseWhileWorking));
+
             var generator = new TaskDefaultNameGenerator<Manipulator>(tasks);
             Name = generator.Generate();
 
             ResetAsync().Wait();
+
+            CloseCommand = new Command(() => Close());
         }
 
         #endregion
@@ -31,12 +36,16 @@ namespace FileManipulator.Models.Manipulator
         #region Fields
 
         private CancellationTokenSource cancellationTokenSource;
+        private readonly ICollection<ITask> tasks;
+        private readonly Func<bool> onCloseWhileWorking;
 
         #endregion
 
         #region Properties
 
         public IEnumerable<string> FilePaths { get; set; }
+
+        public string DestinationDir { get; set; }
 
         public SynchronizationContext SynchronizationContext { get; set; } = SynchronizationContext.Current;
 
@@ -73,7 +82,7 @@ namespace FileManipulator.Models.Manipulator
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var info = new ISourceFileInfo
+                        var info = new SourceFileInfo
                         {
                             SourceFileName = path,
                             SourceFileContent = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)),
@@ -92,7 +101,7 @@ namespace FileManipulator.Models.Manipulator
                         cancellationToken.ThrowIfCancellationRequested();
 
                         SynchronizationContext.Send(state => filter.State = SubTaskState.Working, null);
-                        sourceFileInfos = await filter.Filter(sourceFileInfos);
+                        sourceFileInfos = await filter.FilterAsync(sourceFileInfos);
                         SynchronizationContext.Send(state => filter.State = SubTaskState.Done, null);
                     }
 
@@ -104,7 +113,7 @@ namespace FileManipulator.Models.Manipulator
                         cancellationToken.ThrowIfCancellationRequested();
 
                         SynchronizationContext.Send(state => filter.State = SubTaskState.Working, null);
-                        sourceFileInfos = await filter.Filter(sourceFileInfos);
+                        sourceFileInfos = await filter.FilterAsync(sourceFileInfos);
                         SynchronizationContext.Send(state => filter.State = SubTaskState.Done, null);
                     }
             }
@@ -113,7 +122,9 @@ namespace FileManipulator.Models.Manipulator
                 if(sourceFileInfos != null)
                     foreach(var fileInfo in sourceFileInfos)
                     {
-
+                        var stream = fileInfo.SourceFileContent?.BaseStream;
+                        fileInfo.SourceFileContent?.Dispose();
+                        stream?.Dispose();
                     }
 
                 throw;
@@ -124,7 +135,85 @@ namespace FileManipulator.Models.Manipulator
 
         private async STT.Task ManipulateFilesAsync(IEnumerable<IDestinationFileInfo> files, CancellationToken cancellationToken)
         {
-            
+            cancellationToken.ThrowIfCancellationRequested();
+
+            foreach(var manipulation in Manipulations)
+                if(manipulation is INameManipulation)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    SynchronizationContext.Send(state => manipulation.State = SubTaskState.Working, null);
+                    await manipulation.ManipulateAsync(files);
+                    SynchronizationContext.Send(state => manipulation.State = SubTaskState.Done, null);
+                }
+
+            if(!string.IsNullOrEmpty(DestinationDir))
+            {
+                if (!Directory.Exists(DestinationDir))
+                    Directory.CreateDirectory(DestinationDir);
+
+                foreach(var file in files)
+                {
+                    file.DestinationFileName = Path.Combine(DestinationDir, Path.GetFileName(file.DestinationFileName));
+                }
+            }
+
+            foreach (var fileInfo in files)
+                if (fileInfo.SourceFileName != fileInfo.DestinationFileName &&
+                    !string.IsNullOrWhiteSpace(fileInfo.DestinationFileName) &&
+                    File.Exists(fileInfo.DestinationFileName))
+                    throw new IOException("Destination file exists.");
+
+            foreach(var manipulation in Manipulations)
+                if(manipulation is IContentManipulation)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    SynchronizationContext.Send(state => manipulation.State = SubTaskState.Working, null);
+                    await manipulation.ManipulateAsync(files);
+                    SynchronizationContext.Send(state => manipulation.State = SubTaskState.Done, null);
+                }
+
+            Parallel.ForEach(files, async (fileInfo, state) =>
+            {
+                var stream = fileInfo?.SourceFileContent?.BaseStream;
+                fileInfo?.SourceFileContent?.Dispose();
+                stream?.Dispose();
+
+                FileStream file = null;
+
+                if(cancellationToken.IsCancellationRequested)
+                {
+                    state.Stop();
+                    return;
+                }
+
+                if (fileInfo.SourceFileName != fileInfo.DestinationFileName)
+                {
+                    if(!fileInfo.IsTextFile)
+                    {
+                        File.Move(fileInfo.SourceFileName, fileInfo.DestinationFileName);
+                    }
+                    else
+                    {
+                        file = new FileStream(fileInfo.DestinationFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+                    }
+                }
+
+                if (file == null)
+                    file = new FileStream(fileInfo.DestinationFileContent, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+                file.SetLength(0);
+
+                using (var writer = new StreamWriter(file))
+                {
+                    await writer.WriteAsync(fileInfo.DestinationFileContent);
+
+                    await writer.FlushAsync();
+                }
+            });
+
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         public override STT.Task PauseAsync()
@@ -176,12 +265,11 @@ namespace FileManipulator.Models.Manipulator
                     State = TaskState.Error;
                     LastError = exc;
                 }, null);
+
                 Error.OnNext(new TaskErrorEventArgs(exc, this));
             }
-            finally
-            {
 
-            }
+            SynchronizationContext.Send(state => State = TaskState.Done, null);
         }
 
         public async override STT.Task StopAsync()
@@ -193,9 +281,25 @@ namespace FileManipulator.Models.Manipulator
             }
         }
 
-        public override void Dispose()
+        public async void Close()
         {
-            
+            if(State == TaskState.Working || State == TaskState.Paused)
+            {
+                if (!this.onCloseWhileWorking())
+                    return;
+
+                await StopAsync();
+            }
+
+            while (State == TaskState.Working || State == TaskState.Paused);
+
+            base.Close(this.tasks);
+        }
+
+        public async override void Dispose()
+        {
+            if (State == TaskState.Working || State == TaskState.Paused)
+                await StopAsync();
         }
 
         #endregion
