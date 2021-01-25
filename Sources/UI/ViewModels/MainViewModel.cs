@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 using FileManipulator.Models.Manipulator;
@@ -23,6 +22,7 @@ namespace FileManipulator.UI
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());
             CreateNewManipulatorTaskCommand = new Command(() => CreateNew<Manipulator>());
             HelpCommand = new Command(() => Process.Start(Path.Combine(Environment.CurrentDirectory, "Pomoc.docx")));
+            
             EditTaskNameCommand = new ReactiveCommand(
                 Observable.FromEventPattern(this, "PropertyChanged")
                 .Select(args => (args.EventArgs as PropertyChangedEventArgs).PropertyName)
@@ -35,15 +35,15 @@ namespace FileManipulator.UI
 
         #region Fields
 
-        private Task selectedTask;
+        private ITask selectedTask;
 
         #endregion
 
         #region Properties
 
-        public ObservableCollection<Task> Tasks { get; set; } = new ObservableCollection<Task>();
+        public ObservableCollection<ITask> Tasks { get; set; } = new ObservableCollection<ITask>();
 
-        public Task SelectedTask
+        public ITask SelectedTask
         {
             get => this.selectedTask;
             set => SetProperty(ref this.selectedTask, value);
@@ -62,6 +62,8 @@ namespace FileManipulator.UI
 
         public ICommand HelpCommand { get; }
 
+        public Func<bool> MessageOnCloseWhileTaskWorking { get; set; }
+
         #endregion
 
         #region Methods
@@ -79,7 +81,7 @@ namespace FileManipulator.UI
             }
             else if (typeof(TaskType) == typeof(Manipulator))
             {
-                newTask = new Manipulator(Tasks);
+                newTask = new Manipulator(Tasks, MessageOnCloseWhileTaskWorking);
             }
             else
                 throw new InvalidOperationException("Invalid task type.");
@@ -95,7 +97,7 @@ namespace FileManipulator.UI
 
             RenameWindow window = new RenameWindow();
 
-            
+            throw new NotImplementedException();//TODO
         }
 
         public async void Close(Func<bool> canClose, CancelEventArgs e)
