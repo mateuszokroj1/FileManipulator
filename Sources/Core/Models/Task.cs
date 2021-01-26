@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Subjects;
@@ -11,6 +10,12 @@ namespace FileManipulator
 {
     public abstract class Task : ModelBase, ITask
     {
+        #region Constructor
+
+        protected Task() : base() { }
+
+        #endregion
+
         #region Fields
 
         private TaskState state = TaskState.Undefined;

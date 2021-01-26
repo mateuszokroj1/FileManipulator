@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Windows.Input;
 
 using STT = System.Threading.Tasks;
 
@@ -15,7 +13,7 @@ namespace FileManipulator.Models.Watcher
     {
         #region Constructor
 
-        public Watcher(ICollection<ITask> tasks)
+        public Watcher(ICollection<ITask> tasks) : base()
         {
             this.tasksCollection = tasks ?? throw new ArgumentNullException(nameof(tasks));
 
@@ -24,13 +22,12 @@ namespace FileManipulator.Models.Watcher
             ResetAsync().Wait();
 
             this.pathObserver =
-            Observable.FromEventPattern(this, "PropertyChanged")
-            .Select(args => (args.EventArgs as PropertyChangedEventArgs)?.PropertyName)
-            .Where(propertyName => propertyName == nameof(Path))
-            .Where(p => State != TaskState.Working && State != TaskState.Paused)
-            .Subscribe(async p =>
+                PropertyChangedObservable
+                .Where(propertyName => propertyName == nameof(Path))
+                .Where(p => State != TaskState.Working && State != TaskState.Paused)
+                .Subscribe(async p =>
                 {
-                    this.watcher.Dispose();
+                    this.watcher?.Dispose();
 
                     if (CheckPathIsValid(Path))
                     {
@@ -39,6 +36,11 @@ namespace FileManipulator.Models.Watcher
 
                     OnPropertyChanged(nameof(IncludeSubdirectories));
                 });
+
+            IncludeSubdirectoriesChanged = CreatePropertyChangedObservable(nameof(IncludeSubdirectories), () => IncludeSubdirectories);
+            CanStartChanged = CreatePropertyChangedObservable(nameof(CanStart), () => CanStart);
+            CanStopChanged = CreatePropertyChangedObservable(nameof(CanStop), () => CanStop);
+            CanPauseChanged = CreatePropertyChangedObservable(nameof(CanPause), () => CanPause);
 
             CloseCommand = new Command(() => Close());
         }
@@ -56,6 +58,14 @@ namespace FileManipulator.Models.Watcher
         #endregion
 
         #region Properties
+
+        public IObservable<bool> IncludeSubdirectoriesChanged { get; }
+
+        public IObservable<bool> CanPauseChanged { get; }
+
+        public IObservable<bool> CanStartChanged { get; }
+
+        public IObservable<bool> CanStopChanged { get; }
 
         public string Path
         {
@@ -122,7 +132,21 @@ namespace FileManipulator.Models.Watcher
                 Stopped.OnNext(new TaskEventArgs(this));
             }
 
-            ConfigureNewWatcher();
+            try
+            {
+                if(CheckPathIsValid(Path))
+                    this.watcher = new FileSystemWatcher(Path);
+            }
+            catch (Exception exc)
+            {
+                SynchronizationContext.Send(state =>
+                {
+                    LastError = exc;
+                    State = TaskState.Error;
+                }, null);
+
+                Error.OnNext(new TaskErrorEventArgs(exc, this));
+            }
 
             SynchronizationContext.Send(state =>
             {
@@ -141,6 +165,8 @@ namespace FileManipulator.Models.Watcher
 
             if (this.watcher == null)
                 throw new InvalidOperationException("Watcher is null.");
+
+            ConfigureWatcher();
 
             try
             {
@@ -187,25 +213,10 @@ namespace FileManipulator.Models.Watcher
             State = TaskState.Error;
         }
 
-        private void ConfigureNewWatcher()
+        private void ConfigureWatcher()
         {
-            if (string.IsNullOrEmpty(Path))
+            if (this.watcher == null)
                 return;
-
-            try
-            {
-                this.watcher = new FileSystemWatcher(Path);
-            }
-            catch(Exception exc)
-            {
-                SynchronizationContext.Send(state =>
-                {
-                    LastError = exc;
-                    State = TaskState.Error;
-                }, null);
-
-                Error.OnNext(new TaskErrorEventArgs(exc, this));
-            }
 
             this.watcherObservers[0] = Observable.FromEventPattern<ErrorEventHandler, ErrorEventArgs>(
                 handler => this.watcher.Error += handler,

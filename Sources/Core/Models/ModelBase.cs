@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 
 namespace FileManipulator
@@ -6,6 +8,16 @@ namespace FileManipulator
     public abstract class ModelBase : INotifyPropertyChanged
     {
         #region Constructor
+
+        protected ModelBase()
+        {
+            PropertyChangedObservable =
+                Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                    handler => PropertyChanged += handler,
+                    handler => PropertyChanged -= handler
+                )
+                .Select(args => args?.EventArgs.PropertyName);
+        }
 
         #endregion
 
@@ -16,6 +28,8 @@ namespace FileManipulator
         #endregion
 
         #region Properties
+
+        protected IObservable<string> PropertyChangedObservable { get; }
 
         #endregion
 
@@ -45,6 +59,9 @@ namespace FileManipulator
                 foreach (var name in propertiesNames)
                     OnPropertyChanged(name);
         }
+
+        protected IObservable<TValue> CreatePropertyChangedObservable<TValue>(string propertyName, Func<TValue> resultValue) =>
+            PropertyChangedObservable.Where(name => name == propertyName).Select(n => resultValue());
 
         #endregion
     }

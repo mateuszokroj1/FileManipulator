@@ -2,7 +2,7 @@
 
 namespace FileManipulator
 {
-    public sealed class ReactiveCommand : Command
+    public sealed class ReactiveCommand : Command, IDisposable
     {
         #region Constructor
 
@@ -36,6 +36,15 @@ namespace FileManipulator
 
         private readonly IDisposable unsubscriber;
         private bool canExecuteValue;
+
+        #endregion
+
+        #region Methods
+
+        public void Dispose()
+        {
+            this.unsubscriber?.Dispose();
+        }
 
         #endregion
     }
