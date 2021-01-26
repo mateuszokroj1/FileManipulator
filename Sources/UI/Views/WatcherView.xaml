@@ -9,6 +9,9 @@
              x:Name="Root"
              Background="{x:Static SystemColors.ControlBrush}"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <viewmodels:WatcherViewModel />
+    </UserControl.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

@@ -12,10 +12,8 @@ namespace FileManipulator.ViewModels
     {
         #region Constructors
 
-        public WatcherViewModel(Watcher model)
+        public WatcherViewModel()
         {
-            Watcher = model ?? throw new ArgumentNullException(nameof(model));
-
             this.propertyChangedObservable =
                 Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>
                 (
@@ -47,7 +45,7 @@ namespace FileManipulator.ViewModels
 
         #region Properties
 
-        public Watcher Watcher { get; }
+        public Watcher Watcher { get; set; }
 
         public string Path
         {
@@ -61,7 +59,7 @@ namespace FileManipulator.ViewModels
             set => SetProperty(ref this.includeSubdirectories, value);
         }
 
-        public ObservableCollection<WatcherAction> Actions => Watcher.Actions;
+        public ObservableCollection<WatcherAction> Actions => Watcher?.Actions ?? new ObservableCollection<WatcherAction>();
 
         public bool IsDirectoryPath
         {
@@ -81,7 +79,7 @@ namespace FileManipulator.ViewModels
 
         #region Methods
 
-        public void Clear() => Actions.Clear();
+        public void Clear() => Actions?.Clear();
 
         public void Start()
         {
