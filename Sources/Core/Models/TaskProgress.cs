@@ -10,6 +10,15 @@ namespace FileManipulator
 
         public TaskProgress()
         {
+            this.propertyChangedObservable =
+                Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>
+                (
+                    handler => PropertyChanged += handler,
+                    handler => PropertyChanged -= handler
+                )
+                .Where(args => !string.IsNullOrWhiteSpace(args?.EventArgs?.PropertyName))
+                .Select(args => args.EventArgs.PropertyName);
+
             OnValueChanged =
                 this.propertyChangedObservable
                 .Where(propertyName => propertyName == nameof(ProgressValue))

@@ -31,12 +31,12 @@ namespace FileManipulator.UI
 
         public static readonly DependencyProperty TasksProperty = DependencyProperty.Register(
             "Tasks",
-            typeof(ObservableCollection<Task>),
+            typeof(ObservableCollection<ITask>),
             typeof(TasksView));
 
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(
             "SelectedItem",
-            typeof(Task),
+            typeof(ITask),
             typeof(TasksView)
             );
 
@@ -44,15 +44,15 @@ namespace FileManipulator.UI
 
         #region Properties
 
-        public ObservableCollection<Task> Tasks
+        public ObservableCollection<ITask> Tasks
         {
-            get => GetValue(TasksProperty) as ObservableCollection<Task>;
+            get => GetValue(TasksProperty) as ObservableCollection<ITask>;
             set => SetValue(TasksProperty, value);
         }
 
-        public Task SelectedItem
+        public ITask SelectedItem
         {
-            get => GetValue(SelectedItemProperty) as Task;
+            get => GetValue(SelectedItemProperty) as ITask;
             set => SetValue(SelectedItemProperty, value);
         }
 

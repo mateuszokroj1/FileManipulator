@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -16,9 +17,18 @@ namespace FileManipulator.UI
 
         public FilesSelectorViewModel()
         {
+            this.propertyChangedObservable = 
+                Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>
+                (
+                    handler => PropertyChanged += handler,
+                    handler => PropertyChanged -= handler
+                )
+                .Where(args => !string.IsNullOrWhiteSpace(args?.EventArgs?.PropertyName))
+                .Select(args => args.EventArgs.PropertyName);
+
             BrowseCommand = new Command(() => Browse());
             DeleteCommand = new ReactiveCommand(
-               PropertyChangedObservable
+               this.propertyChangedObservable
                .Where(name => name == nameof(SelectedFile))
                .Select(n => Files.Contains(SelectedFile)),
                () => DeleteSelectedFile()
@@ -35,6 +45,7 @@ namespace FileManipulator.UI
         private bool isDirectoryValid;
         private bool isFilesValid;
         private string selectedFile;
+        private IObservable<string> propertyChangedObservable;
 
         #endregion
 

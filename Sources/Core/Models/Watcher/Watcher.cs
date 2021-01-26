@@ -107,7 +107,8 @@ namespace FileManipulator.Models.Watcher
             foreach (var observer in this.watcherObservers)
                 observer?.Dispose();
 
-            this.watcher.EnableRaisingEvents = false;
+            if(this.watcher != null)
+                this.watcher.EnableRaisingEvents = false;
 
             foreach (var observer in this.watcherObservers)
                 observer?.Dispose();

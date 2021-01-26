@@ -17,12 +17,12 @@
         <local:TasksViewTemplateSelector x:Key="TemplateSelector">
             <local:TasksViewTemplateSelector.WatcherTemplate>
                 <DataTemplate DataType="{x:Type watcher:Watcher}">
-                    <local:WatcherView/>
+                    <local:WatcherView Watcher="{}" />
                 </DataTemplate>
             </local:TasksViewTemplateSelector.WatcherTemplate>
             <local:TasksViewTemplateSelector.ManipulatorTemplate>
                 <DataTemplate DataType="{x:Type manipulator:Manipulator}">
-                    <local:ManipulatorView/>
+                    <local:ManipulatorView />
                 </DataTemplate>
             </local:TasksViewTemplateSelector.ManipulatorTemplate>
             <local:TasksViewTemplateSelector.UndefinedTemplate>
