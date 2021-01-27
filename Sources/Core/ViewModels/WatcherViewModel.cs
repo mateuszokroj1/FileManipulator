@@ -16,22 +16,28 @@ namespace FileManipulator.ViewModels
     {
         #region Constructors
 
-        public WatcherViewModel()
+        public WatcherViewModel(Watcher watcher)
         {
+            Watcher = watcher ?? throw new ArgumentNullException(nameof(watcher));
+
             ClearCommand = new Command(() => Clear());
             BrowseCommand = new Command(() => Browse());
 
             SetCommands();
 
-            this.watcherObservable1 = CreatePropertyChangedObservable(nameof(Watcher), () => Watcher)
-                .Subscribe(watcher =>
-                {
-                    this.watcherObservable2 = watcher?.IncludeSubdirectoriesChanged
+
+                    this.watcherObservable2 = Watcher?.IncludeSubdirectoriesChanged
                     .ObserveOn(SynchronizationContext.Current)
                     .Subscribe(neValue => OnPropertyChanged(nameof(IncludeSubdirectories)));
 
+                    this.watcherObservable3 = Watcher?.CanStartChanged.Merge(Watcher?.CanStopChanged).Subscribe(_ =>
+                        OnPropertyChanged(nameof(CanEditSettings))
+                    );
+
                     SetCommands();
-                });
+
+
+            PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
 
             IsDirectoryPath = true;
         }
@@ -43,11 +49,12 @@ namespace FileManipulator.ViewModels
         private bool isDirectoryPath;
         private string path;
         private bool includeSubdirectories;
-        private Watcher watcher;
         private ICommand startCommand;
         private ICommand pauseCommand;
         private ICommand stopCommand;
-        private IDisposable watcherObservable1, watcherObservable2;
+        private IDisposable watcherObservable1,
+                            watcherObservable2,
+                            watcherObservable3;
 
         #endregion
 
@@ -57,11 +64,7 @@ namespace FileManipulator.ViewModels
 
         public Action<Exception> OnError { get; set; }
 
-        public Watcher Watcher
-        {
-            get => this.watcher;
-            set => SetProperty(ref this.watcher, value);
-        }
+        public Watcher Watcher { get; }
 
         public string Path
         {
@@ -104,6 +107,10 @@ namespace FileManipulator.ViewModels
         public ICommand ClearCommand { get; }
 
         public ICommand BrowseCommand { get; }
+
+        public bool CanEditSettings => !(Watcher?.CanStop ?? false) && (Watcher?.CanStart ?? false);
+
+        public IObservable<string> PathChanged { get; }
 
         #endregion
 

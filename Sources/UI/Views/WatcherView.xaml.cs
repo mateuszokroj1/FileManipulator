@@ -15,26 +15,12 @@ namespace FileManipulator.UI
         public WatcherView()
         {
             InitializeComponent();
-
-            var model = DataContext as WatcherViewModel;
-
-            var binding = new Binding("Watcher");
-            binding.Source = model;
-            binding.Mode = BindingMode.OneWayToSource;
-            SetBinding(WatcherProperty, binding);
-
-            model.OnInvalidInput = () => MessageBox.Show("Podano niepoprawną ścieżkę.", "Watcher", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
-        public static readonly DependencyProperty WatcherProperty = DependencyProperty.Register(
-            "Watcher",
-            typeof(Watcher),
-            typeof(WatcherView));
-
-        public Watcher Watcher
+        private void Root_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            get => GetValue(WatcherProperty) as Watcher;
-            set => SetValue(WatcherProperty, value);
+            if(DataContext is WatcherViewModel model)
+                model.OnInvalidInput = () => MessageBox.Show("Podano niepoprawną ścieżkę.", "Watcher", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

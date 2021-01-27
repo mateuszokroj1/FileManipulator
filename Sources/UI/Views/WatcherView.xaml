@@ -8,17 +8,14 @@
              mc:Ignorable="d"
              x:Name="Root"
              Background="{x:Static SystemColors.ControlBrush}"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <viewmodels:WatcherViewModel />
-    </UserControl.DataContext>
+             d:DesignHeight="450" d:DesignWidth="800" DataContextChanged="Root_DataContextChanged">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" IsEnabled="{Binding CanStop, Mode=OneWay}">
+        <Grid Grid.Row="0" IsEnabled="{Binding CanEditSettings, Mode=OneWay}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />

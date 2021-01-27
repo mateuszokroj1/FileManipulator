@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManipulator.UI"
              xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
-             xmlns:watcher="clr-namespace:FileManipulator.Models.Watcher;assembly=FileManipulator.Core"
-             xmlns:manipulator="clr-namespace:FileManipulator.Models.Manipulator;assembly=FileManipulator.Core"
+             xmlns:viewmodels="clr-namespace:FileManipulator.ViewModels;assembly=FileManipulator.Core"
              mc:Ignorable="d" 
              x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -16,12 +15,12 @@
     <UserControl.Resources>
         <local:TasksViewTemplateSelector x:Key="TemplateSelector">
             <local:TasksViewTemplateSelector.WatcherTemplate>
-                <DataTemplate DataType="{x:Type watcher:Watcher}">
-                    <local:WatcherView Watcher="{}" />
+                <DataTemplate DataType="{x:Type viewmodels:WatcherViewModel}">
+                    <local:WatcherView DataContext="{Binding}" />
                 </DataTemplate>
             </local:TasksViewTemplateSelector.WatcherTemplate>
             <local:TasksViewTemplateSelector.ManipulatorTemplate>
-                <DataTemplate DataType="{x:Type manipulator:Manipulator}">
+                <DataTemplate DataType="{x:Type viewmodels:ManipulatorViewModel}">
                     <local:ManipulatorView />
                 </DataTemplate>
             </local:TasksViewTemplateSelector.ManipulatorTemplate>
@@ -40,7 +39,7 @@
         </local:TasksViewTemplateSelector>
     </UserControl.Resources>
     <Grid>
-        <TabControl ItemsSource="{Binding Tasks, Mode=TwoWay}"
+        <TabControl ItemsSource="{Binding TasksViewModels}"
                     SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}"
                     ContentTemplateSelector="{StaticResource TemplateSelector}">
             <TabControl.ItemTemplate>
