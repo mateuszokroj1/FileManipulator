@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading;
@@ -27,11 +26,10 @@ namespace FileManipulator.ViewModels
 
             this.watcherObservable1 = Model.IncludeSubdirectoriesChanged
             .ObserveOn(SynchronizationContext.Current)
-            .Subscribe(neValue => OnPropertyChanged(nameof(IncludeSubdirectories)));
+            .Subscribe(_ => OnPropertyChanged(nameof(IncludeSubdirectories)));
 
-            this.watcherObservable2 = Model.CanStartChanged
-                .Merge(Model.CanStopChanged)
-                .Subscribe(_ => OnPropertyChanged(nameof(CanEditSettings)));
+            this.watcherObservable2 = Model.StateChanged
+            .Subscribe(_ => OnPropertyChanged(nameof(CanEditSettings)));
 
             PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
 
@@ -100,7 +98,7 @@ namespace FileManipulator.ViewModels
 
         public ICommand BrowseCommand { get; }
 
-        public bool CanEditSettings => !Model.CanStop && Model.CanStart;
+        public bool CanEditSettings => Model.State == TaskState.Ready;
 
         public IObservable<string> PathChanged { get; }
 
@@ -108,7 +106,11 @@ namespace FileManipulator.ViewModels
 
         #region Methods
 
-        public void Clear() => Actions?.Clear();
+        public async void Clear()
+        {
+            await Model.StopAsync();
+            await Model.ResetAsync();
+        }
 
         private bool CheckPathIsValid()
         {

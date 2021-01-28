@@ -12,7 +12,10 @@ namespace FileManipulator
     {
         #region Constructor
 
-        protected Task() : base() { }
+        protected Task() : base()
+        {
+            StateChanged = CreatePropertyChangedObservable(nameof(State), () => State);
+        }
 
         #endregion
 
@@ -43,6 +46,8 @@ namespace FileManipulator
         public Subject<TaskEventArgs> Completed { get; } = new Subject<TaskEventArgs>();
 
         public ICommand CloseCommand { get; protected set; }
+
+        public IObservable<TaskState> StateChanged { get; }
 
         /// <summary>
         /// Actual task state
