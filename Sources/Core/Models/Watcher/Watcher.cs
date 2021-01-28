@@ -22,9 +22,8 @@ namespace FileManipulator.Models.Watcher
             ResetAsync().Wait();
 
             this.pathObserver =
-                PropertyChangedObservable
-                .Where(propertyName => propertyName == nameof(Path))
-                .Where(p => State != TaskState.Working && State != TaskState.Paused)
+                CreatePropertyChangedObservable(nameof(Path), () => Path)
+                .Where(_ => State != TaskState.Working && State != TaskState.Paused)
                 .Subscribe(async p =>
                 {
                     this.watcher?.Dispose();
@@ -35,7 +34,15 @@ namespace FileManipulator.Models.Watcher
                     }
 
                     OnPropertyChanged(nameof(IncludeSubdirectories));
+                    OnPropertyChanged(nameof(CanStart));
                 });
+
+            this.stateObserver = StateChanged.Subscribe(_ =>
+                    {
+                        OnPropertyChanged(nameof(CanStart));
+                        OnPropertyChanged(nameof(CanStop));
+                        OnPropertyChanged(nameof(CanPause));
+                    });
 
             IncludeSubdirectoriesChanged = CreatePropertyChangedObservable(nameof(IncludeSubdirectories), () => IncludeSubdirectories);
             CanStartChanged = CreatePropertyChangedObservable(nameof(CanStart), () => CanStart);
@@ -52,6 +59,7 @@ namespace FileManipulator.Models.Watcher
         private string path;
         private FileSystemWatcher watcher;
         private readonly IDisposable pathObserver;
+        private readonly IDisposable stateObserver;
         private readonly ICollection<ITask> tasksCollection;
         private readonly IDisposable[] watcherObservers = new IDisposable[5];
         
@@ -281,6 +289,7 @@ namespace FileManipulator.Models.Watcher
         public override void Dispose()
         {
             this.pathObserver?.Dispose();
+            this.stateObserver?.Dispose();
 
             foreach (var observer in this.watcherObservers)
                 observer?.Dispose();
