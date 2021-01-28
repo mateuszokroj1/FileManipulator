@@ -4,8 +4,8 @@ namespace FileManipulator
 {
     public interface ITasksViewModel
     {
-        ITask SelectedItem { get; set; }
+        IViewModelWithModelProperty SelectedItem { get; set; }
 
-        ObservableCollection<ModelBase> TasksViewModels { get; }
+        ObservableCollection<IViewModelWithModelProperty> TasksViewModels { get; }
     }
 }

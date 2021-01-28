@@ -26,26 +26,66 @@ namespace FileManipulator
 
         #region Fields
 
-        private ITask selectedItem;
+        private IViewModelWithModelProperty selectedItem;
         private IDisposable disposable;
 
         #endregion
 
         #region Properties
 
-        public ObservableCollection<ModelBase> TasksViewModels { get; } = new ObservableCollection<ModelBase>();
+        public ObservableCollection<IViewModelWithModelProperty> TasksViewModels { get; } = new ObservableCollection<IViewModelWithModelProperty>();
 
-        public ITask SelectedItem
+        public IViewModelWithModelProperty SelectedItem
         {
             get => this.selectedItem;
             set => SetProperty(ref this.selectedItem, value);
         }
 
-        public IObservable<ITask> SelectedItemChanged { get; }
+        public IObservable<IViewModelWithModelProperty> SelectedItemChanged { get; }
 
         #endregion
 
         #region Methods
+
+        public void SelectTask(ITask task)
+        {
+            IViewModelWithModelProperty viewModel = null;
+
+            if(task is Watcher watcher)
+            {
+                foreach(var vm in TasksViewModels)
+                {
+                    if(vm is WatcherViewModel wvw && wvw.Model == watcher)
+                    {
+                        viewModel = vm;
+                        break;
+                    }
+                }
+            }
+            else if(task is Manipulator manipulator)
+            {
+                foreach (var vm in TasksViewModels)
+                {
+                    if (vm is ManipulatorViewModel mvw && mvw.Model == manipulator)
+                    {
+                        viewModel = vm;
+                        break;
+                    }
+                }
+            }
+
+            SelectedItem = viewModel;
+        }
+
+        public ITask GetSelectedTask()
+        {
+            if (SelectedItem is WatcherViewModel watcher)
+                return watcher.Model;
+            else if (SelectedItem is ManipulatorViewModel manipulator)
+                return manipulator.Model;
+            else
+                return null;
+        }
 
         private void ConfigureTasksObserver()
         {
@@ -105,7 +145,12 @@ namespace FileManipulator
                         .Select(modelBase => modelBase as WatcherViewModel)
                         .Where(viewModel => viewModel?.Model == watcher)
                         .Count() < 1)
-                        TasksViewModels.Add(new WatcherViewModel(watcher));
+                    {
+                        var newItem = new WatcherViewModel(watcher);
+                        TasksViewModels.Add(newItem);
+                        SelectedItem = newItem;
+                    }
+                        
                 }
                 else if (task is Manipulator manipulator)
                 {
@@ -113,7 +158,12 @@ namespace FileManipulator
                         .Select(modelBase => modelBase as ManipulatorViewModel)
                         .Where(viewModel => viewModel?.Model == manipulator)
                         .Count() < 1)
-                        TasksViewModels.Add(new ManipulatorViewModel(manipulator));
+                    {
+                        var newItem = new ManipulatorViewModel(manipulator);
+                        TasksViewModels.Add(newItem);
+                        SelectedItem = newItem;
+                    }
+                        
                 }
             }
         }

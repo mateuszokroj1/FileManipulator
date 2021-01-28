@@ -1,6 +1,8 @@
 ﻿namespace FileManipulator
 {
-    public interface IViewModelWithModelProperty<TModel>
+    public interface IViewModelWithModelProperty { }
+
+    public interface IViewModelWithModelProperty<TModel> : IViewModelWithModelProperty
     {
         TModel Model { get; }
     }
