@@ -21,17 +21,17 @@ namespace FileManipulator.ViewModels
         {
             TasksViewModel = new TasksViewModel(Tasks);
 
-            SelectedTaskChanged = CreatePropertyChangedObservable(nameof(SelectedTask), () => SelectedTask);
+            SelectedItemChanged = CreatePropertyChangedObservable(nameof(SelectedItem), () => SelectedItem);
 
-            SelectedTaskChanged.Subscribe(value => TasksViewModel.SelectedItem = value);
-            TasksViewModel.SelectedItemChanged.Subscribe(value => SelectedTask = value);
+            SelectedItemChanged.Subscribe(value => TasksViewModel.SelectedItem = value);
+            TasksViewModel.SelectedItemChanged.Subscribe(value => SelectedItem = value);
 
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());
             CreateNewManipulatorTaskCommand = new Command(() => CreateNew<Manipulator>());
             HelpCommand = new Command(() => Process.Start(Path.Combine(Environment.CurrentDirectory, "Pomoc.docx")));
             
             EditTaskNameCommand = new ReactiveCommand(
-                SelectedTaskChanged.Select(_ => SelectedTask != null),
+                SelectedItemChanged.Select(_ => SelectedItem != null),
                 () => EditTaskName(RenameDialog));
         }
 
@@ -39,7 +39,7 @@ namespace FileManipulator.ViewModels
 
         #region Fields
 
-        private ITask selectedTask;
+        private IViewModelWithModelProperty selectedItem;
 
         #endregion
 
@@ -51,13 +51,13 @@ namespace FileManipulator.ViewModels
 
         public ITextDialog RenameDialog { get; set; }
 
-        public ITask SelectedTask
+        public IViewModelWithModelProperty SelectedItem
         {
-            get => this.selectedTask;
-            set => SetProperty(ref this.selectedTask, value);
+            get => this.selectedItem;
+            set => SetProperty(ref this.selectedItem, value);
         }
 
-        public IObservable<ITask> SelectedTaskChanged { get; }
+        public IObservable<IViewModelWithModelProperty> SelectedItemChanged { get; }
 
         public bool IsAnyWorkingTasks =>
             Tasks
@@ -97,7 +97,7 @@ namespace FileManipulator.ViewModels
                 throw new InvalidOperationException("Invalid task type.");
 
             Tasks.Add(newTask);
-            SelectedTask = newTask;
+            //TasksViewModel.SelectTask(newTask);
         }
 
         public void EditTaskName(ITextDialog window)
@@ -105,15 +105,17 @@ namespace FileManipulator.ViewModels
             if (window == null)
                 throw new ArgumentNullException(nameof(window));
 
-            if (SelectedTask == null)
+            if (SelectedItem == null)
                 return;
 
-            window.Value = SelectedTask.Name;
+            ITask task = TasksViewModel.GetSelectedTask();
+
+            window.Value = task.Name;
 
             if (!window.ShowDialog())
                 return;
 
-            SelectedTask.Name = window.Value;
+            task.Name = window.Value;
         }
 
         public async void Close(Func<bool> canClose, CancelEventArgs e)

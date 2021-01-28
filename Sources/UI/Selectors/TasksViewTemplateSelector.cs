@@ -3,6 +3,7 @@ using System.Windows.Controls;
 
 using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Watcher;
+using FileManipulator.ViewModels;
 
 namespace FileManipulator.UI
 {
@@ -22,9 +23,9 @@ namespace FileManipulator.UI
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is Watcher)
+            if (item is WatcherViewModel)
                 return WatcherTemplate;
-            else if (item is Manipulator)
+            else if (item is ManipulatorViewModel)
                 return ManipulatorTemplate;
             else
                 return UndefinedTemplate;
