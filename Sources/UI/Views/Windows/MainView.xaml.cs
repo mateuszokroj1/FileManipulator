@@ -10,6 +10,7 @@ namespace FileManipulator.UI
         public MainView()
         {
             InitializeComponent();
+
             SetValue(CloseCommandProperty, new Command(() => Close()));
 
             var model = DataContext as MainViewModel;

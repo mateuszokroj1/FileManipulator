@@ -24,7 +24,6 @@ namespace FileManipulator.ViewModels
             SelectedTaskChanged = CreatePropertyChangedObservable(nameof(SelectedTask), () => SelectedTask);
 
             SelectedTaskChanged.Subscribe(value => TasksViewModel.SelectedItem = value);
-
             TasksViewModel.SelectedItemChanged.Subscribe(value => SelectedTask = value);
 
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());

@@ -46,8 +46,8 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="25" />
                         </Grid.ColumnDefinitions>
-                        <Label Content="{Binding Name}" Grid.Column="0" />
-                        <Button FontFamily="Webdings" FontSize="10" Grid.Column="1" Width="20" Height="20" Command="{Binding CloseCommand}">r<!-- Close sign in Webdings font --></Button>
+                        <Label Content="{Binding Model.Name}" Grid.Column="0" />
+                        <Button FontFamily="Webdings" FontSize="10" Grid.Column="1" Width="20" Height="20" Command="{Binding Model.CloseCommand}">r<!-- Close sign in Webdings font --></Button>
                     </Grid>
                 </DataTemplate>
             </TabControl.ItemTemplate>

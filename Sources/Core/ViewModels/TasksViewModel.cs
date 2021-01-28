@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 
 using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Watcher;
@@ -16,8 +17,7 @@ namespace FileManipulator
 
         public TasksViewModel(ObservableCollection<ITask> tasksCollection) : base(tasksCollection)
         {
-            CreatePropertyChangedObservable(nameof(Model), () => Model)
-                .Subscribe(_ => ConfigureTasksObserver());
+            ConfigureTasksObserver();
 
             SelectedItemChanged = CreatePropertyChangedObservable(nameof(SelectedItem), () => SelectedItem);
         }
@@ -49,41 +49,48 @@ namespace FileManipulator
 
         private void ConfigureTasksObserver()
         {
-            if(Model != null)
-            {
-                this.disposable = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
-                    handler => Model.CollectionChanged += handler,
-                    handler => Model.CollectionChanged -= handler
-                )
-                .Subscribe(_ => RefreshCollections());
-            }
-            else
-            {
-                this.disposable?.Dispose();
-                this.disposable = null;
-            }
+            this.disposable = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                handler => Model.CollectionChanged += handler,
+                handler => Model.CollectionChanged -= handler
+            )
+            .ObserveOn(SynchronizationContext.Current)
+            .Subscribe(_ => RefreshCollections());
         }
 
         private void RefreshCollections()
         {
-            CheckThatExistsViewModelsForAllModels();
-
             CheckHaveNotObsoleteViewModels();
+            CheckThatExistsViewModelsForAllModels();
         }
 
         private void CheckHaveNotObsoleteViewModels()
         {
-            foreach (var viewModel in TasksViewModels)
+            while (true)
             {
-                if (viewModel is WatcherViewModel watcherViewModel)
+                if (TasksViewModels.Count < 1)
+                    return;
+
+                foreach (var viewModel in TasksViewModels)
                 {
-                    if (Model.Where(task => task == watcherViewModel.Watcher).Count() < 1)
-                        TasksViewModels.Remove(viewModel);
-                }
-                else if (viewModel is ManipulatorViewModel manipulatorViewModel)
-                {
-                    if (Model.Where(task => task == manipulatorViewModel.Model).Count() < 1)
-                        TasksViewModels.Remove(viewModel);
+                    if (viewModel is WatcherViewModel watcherViewModel)
+                    {
+                        if (Model.Where(task => task == watcherViewModel.Model).Count() < 1)
+                        {
+                            TasksViewModels.Remove(viewModel);
+                            break;
+                        }
+                    }
+                    else if (viewModel is ManipulatorViewModel manipulatorViewModel)
+                    {
+                        if (Model.Where(task => task == manipulatorViewModel.Model).Count() < 1)
+                        {
+                            TasksViewModels.Remove(viewModel);
+                            break;
+                        }
+                    }
+
+                    if (TasksViewModels.LastOrDefault() == viewModel)
+                        return;
                 }
             }
         }
@@ -96,7 +103,7 @@ namespace FileManipulator
                 {
                     if (TasksViewModels
                         .Select(modelBase => modelBase as WatcherViewModel)
-                        .Where(viewModel => viewModel?.Watcher == watcher)
+                        .Where(viewModel => viewModel?.Model == watcher)
                         .Count() < 1)
                         TasksViewModels.Add(new WatcherViewModel(watcher));
                 }

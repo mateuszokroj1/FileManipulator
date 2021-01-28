@@ -12,30 +12,26 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace FileManipulator.ViewModels
 {
-    public class WatcherViewModel : ModelBase, IDisposable
+    public class WatcherViewModel : ViewModelWithModelProperty<Watcher>, IDisposable
     {
         #region Constructors
 
-        public WatcherViewModel(Watcher watcher)
+        public WatcherViewModel(Watcher watcher) : base(watcher)
         {
-            Watcher = watcher ?? throw new ArgumentNullException(nameof(watcher));
-
             ClearCommand = new Command(() => Clear());
             BrowseCommand = new Command(() => Browse());
 
-            SetCommands();
+            StartCommand = new ReactiveCommand(Model.CanStartChanged, () => Start());
+            PauseCommand = new ReactiveCommand(Model.CanPauseChanged, () => Pause());
+            StopCommand = new ReactiveCommand(Model.CanStopChanged, () => Stop());
 
+            this.watcherObservable1 = Model.IncludeSubdirectoriesChanged
+            .ObserveOn(SynchronizationContext.Current)
+            .Subscribe(neValue => OnPropertyChanged(nameof(IncludeSubdirectories)));
 
-                    this.watcherObservable2 = Watcher?.IncludeSubdirectoriesChanged
-                    .ObserveOn(SynchronizationContext.Current)
-                    .Subscribe(neValue => OnPropertyChanged(nameof(IncludeSubdirectories)));
-
-                    this.watcherObservable3 = Watcher?.CanStartChanged.Merge(Watcher?.CanStopChanged).Subscribe(_ =>
-                        OnPropertyChanged(nameof(CanEditSettings))
-                    );
-
-                    SetCommands();
-
+            this.watcherObservable2 = Model.CanStartChanged
+                .Merge(Model.CanStopChanged)
+                .Subscribe(_ => OnPropertyChanged(nameof(CanEditSettings)));
 
             PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
 
@@ -52,9 +48,7 @@ namespace FileManipulator.ViewModels
         private ICommand startCommand;
         private ICommand pauseCommand;
         private ICommand stopCommand;
-        private IDisposable watcherObservable1,
-                            watcherObservable2,
-                            watcherObservable3;
+        private IDisposable watcherObservable1, watcherObservable2;
 
         #endregion
 
@@ -63,8 +57,6 @@ namespace FileManipulator.ViewModels
         public Action OnInvalidInput { get; set; }
 
         public Action<Exception> OnError { get; set; }
-
-        public Watcher Watcher { get; }
 
         public string Path
         {
@@ -78,7 +70,7 @@ namespace FileManipulator.ViewModels
             set => SetProperty(ref this.includeSubdirectories, value);
         }
 
-        public ObservableCollection<WatcherAction> Actions => Watcher?.Actions ?? new ObservableCollection<WatcherAction>();
+        public ObservableCollection<WatcherAction> Actions => Model.Actions ?? new ObservableCollection<WatcherAction>();
 
         public bool IsDirectoryPath
         {
@@ -108,7 +100,7 @@ namespace FileManipulator.ViewModels
 
         public ICommand BrowseCommand { get; }
 
-        public bool CanEditSettings => !(Watcher?.CanStop ?? false) && (Watcher?.CanStart ?? false);
+        public bool CanEditSettings => !Model.CanStop && Model.CanStart;
 
         public IObservable<string> PathChanged { get; }
 
@@ -133,7 +125,7 @@ namespace FileManipulator.ViewModels
 
         public async void Start()
         {
-            if (Watcher == null)
+            if (Model == null)
                 return;
 
             if(!CheckPathIsValid())
@@ -142,33 +134,33 @@ namespace FileManipulator.ViewModels
                 return;
             }
 
-            Watcher.Path = Path;
-            Watcher.IncludeSubdirectories = IsDirectoryPath && IncludeSubdirectories;
+            Model.Path = Path;
+            Model.IncludeSubdirectories = IsDirectoryPath && IncludeSubdirectories;
             
-            if(Watcher.LastError != null)
+            if(Model.LastError != null)
             {
-                OnError?.Invoke(Watcher.LastError);
+                OnError?.Invoke(Model.LastError);
                 return;
             }
 
-            if (Watcher.State != TaskState.Ready || !Watcher.CanStart)
+            if (Model.State != TaskState.Ready || !Model.CanStart)
                 return;
 
-            if (Watcher.State == TaskState.Ready)
+            if (Model.State == TaskState.Ready)
                 Clear();
 
-            await Watcher.StartAsync();
+            await Model.StartAsync();
         }
 
         public async void Pause()
         {
-            await Watcher?.PauseAsync();
+            await Model?.PauseAsync();
         }
 
         public async void Stop()
         {
-            if (Watcher != null && Watcher.CanStop)
-                await Watcher.StopAsync();
+            if (Model != null && Model.CanStop)
+                await Model.StopAsync();
         }
 
         public void Browse()
@@ -188,22 +180,6 @@ namespace FileManipulator.ViewModels
                     return;
 
                 Path = dialog.FileName;
-            }
-        }
-
-        private void SetCommands()
-        {
-            if(Watcher != null)
-            {
-                StartCommand = new ReactiveCommand(Watcher.CanStartChanged, () => Start());
-                PauseCommand = new ReactiveCommand(Watcher.CanPauseChanged, () => Pause());
-                StopCommand = new ReactiveCommand(Watcher.CanStopChanged, () => Stop());
-            }
-            else
-            {
-                StartCommand = new Command(() => false, () => Clear());
-                PauseCommand = new Command(() => false, () => Clear());
-                StopCommand = new Command(() => false, () => Clear());
             }
         }
 
