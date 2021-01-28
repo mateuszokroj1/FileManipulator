@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileManipulator.UI"
         xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
+        xmlns:viewmodels="clr-namespace:FileManipulator.ViewModels;assembly=FileManipulator.Core"
         mc:Ignorable="d"
         x:Name="Window"
         Title="File Manipulator" Height="450" Width="800" Closing="Window_Closing">
     <Window.DataContext>
-        <local:MainViewModel />
+        <viewmodels:MainViewModel />
     </Window.DataContext>
     <Window.InputBindings>
-        <KeyBinding Key="F1"  />
+        <KeyBinding Key="F1" Command="{Binding HelpCommand}" />
     </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -33,7 +34,7 @@
             <MenuItem Header="Pomoc" Command="{Binding HelpCommand}" />
             <MenuItem Header="Zamknij aplikację" Command="{Binding CloseCommand, ElementName=Window}" />
         </Menu>
-        <local:TasksView Grid.Row="1" DataContext="{Binding DataContext, ElementName=Window}" Tasks="{Binding Tasks, Mode=OneWay}" SelectedItem="{Binding SelectedTask, Mode=TwoWay}" />
+        <local:TasksView Grid.Row="1" DataContext="{Binding TasksViewModel}" />
     </Grid>
     
 </Window>

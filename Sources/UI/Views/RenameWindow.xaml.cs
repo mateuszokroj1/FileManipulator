@@ -5,7 +5,7 @@ namespace FileManipulator.UI
     /// <summary>
     /// Logika interakcji dla klasy RenameWindow.xaml
     /// </summary>
-    public partial class RenameWindow : Window
+    public partial class RenameWindow : Window, ITextDialog
     {
         public RenameWindow()
         {
@@ -28,5 +28,7 @@ namespace FileManipulator.UI
                 this.Text.Focus();
             }
         }
+
+        bool ITextDialog.ShowDialog() => base.ShowDialog() ?? false;
     }
 }

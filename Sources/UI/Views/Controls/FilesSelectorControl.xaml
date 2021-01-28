@@ -4,12 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManipulator.UI"
+             xmlns:viewmodels="clr-namespace:FileManipulator.ViewModels;assembly=FileManipulator.Core"
              xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.DataContext>
-        <local:FilesSelectorViewModel />
+        <viewmodels:FilesSelectorViewModel />
     </UserControl.DataContext>
     <UserControl.Resources>
         <local:EqualToBooleanConverter x:Key="Converter" />

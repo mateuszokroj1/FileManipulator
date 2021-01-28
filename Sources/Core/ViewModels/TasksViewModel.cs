@@ -10,33 +10,28 @@ using FileManipulator.ViewModels;
 
 namespace FileManipulator
 {
-    public class TasksViewModel : ModelBase, ITasksViewModel
+    public class TasksViewModel : ViewModelWithModelProperty<ObservableCollection<ITask>>, ITasksViewModel
     {
         #region Constructor
 
-        public TasksViewModel()
+        public TasksViewModel(ObservableCollection<ITask> tasksCollection) : base(tasksCollection)
         {
-            CreatePropertyChangedObservable(nameof(Tasks), () => Tasks)
+            CreatePropertyChangedObservable(nameof(Model), () => Model)
                 .Subscribe(_ => ConfigureTasksObserver());
+
+            SelectedItemChanged = CreatePropertyChangedObservable(nameof(SelectedItem), () => SelectedItem);
         }
 
         #endregion
 
         #region Fields
 
-        private ObservableCollection<ITask> tasks;
         private ITask selectedItem;
         private IDisposable disposable;
 
         #endregion
 
         #region Properties
-
-        public ObservableCollection<ITask> Tasks
-        {
-            get => this.tasks;
-            set => SetProperty(ref this.tasks, value);
-        }
 
         public ObservableCollection<ModelBase> TasksViewModels { get; } = new ObservableCollection<ModelBase>();
 
@@ -46,17 +41,19 @@ namespace FileManipulator
             set => SetProperty(ref this.selectedItem, value);
         }
 
+        public IObservable<ITask> SelectedItemChanged { get; }
+
         #endregion
 
         #region Methods
 
         private void ConfigureTasksObserver()
         {
-            if(Tasks != null)
+            if(Model != null)
             {
                 this.disposable = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
-                    handler => Tasks.CollectionChanged += handler,
-                    handler => Tasks.CollectionChanged -= handler
+                    handler => Model.CollectionChanged += handler,
+                    handler => Model.CollectionChanged -= handler
                 )
                 .Subscribe(_ => RefreshCollections());
             }
@@ -69,9 +66,33 @@ namespace FileManipulator
 
         private void RefreshCollections()
         {
-            foreach(var task in Tasks)
+            CheckThatExistsViewModelsForAllModels();
+
+            CheckHaveNotObsoleteViewModels();
+        }
+
+        private void CheckHaveNotObsoleteViewModels()
+        {
+            foreach (var viewModel in TasksViewModels)
             {
-                if(task is Watcher watcher)
+                if (viewModel is WatcherViewModel watcherViewModel)
+                {
+                    if (Model.Where(task => task == watcherViewModel.Watcher).Count() < 1)
+                        TasksViewModels.Remove(viewModel);
+                }
+                else if (viewModel is ManipulatorViewModel manipulatorViewModel)
+                {
+                    if (Model.Where(task => task == manipulatorViewModel.Model).Count() < 1)
+                        TasksViewModels.Remove(viewModel);
+                }
+            }
+        }
+
+        private void CheckThatExistsViewModelsForAllModels()
+        {
+            foreach (var task in Model)
+            {
+                if (task is Watcher watcher)
                 {
                     if (TasksViewModels
                         .Select(modelBase => modelBase as WatcherViewModel)
@@ -79,27 +100,13 @@ namespace FileManipulator
                         .Count() < 1)
                         TasksViewModels.Add(new WatcherViewModel(watcher));
                 }
-                else if(task is Manipulator manipulator)
+                else if (task is Manipulator manipulator)
                 {
                     if (TasksViewModels
                         .Select(modelBase => modelBase as ManipulatorViewModel)
-                        .Where(viewModel => viewModel?.Manipulator == manipulator)
+                        .Where(viewModel => viewModel?.Model == manipulator)
                         .Count() < 1)
                         TasksViewModels.Add(new ManipulatorViewModel(manipulator));
-                }
-            }
-
-            foreach(var viewModel in TasksViewModels)
-            {
-                if(viewModel is WatcherViewModel watcherViewModel)
-                {
-                    if (Tasks.Where(task => task == watcherViewModel.Watcher).Count() < 1)
-                        TasksViewModels.Remove(viewModel);
-                }
-                else if(viewModel is ManipulatorViewModel manipulatorViewModel)
-                {
-                    if (Tasks.Where(task => task == manipulatorViewModel.Manipulator).Count() < 1)
-                        TasksViewModels.Remove(viewModel);
                 }
             }
         }

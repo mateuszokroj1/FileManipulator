@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-namespace FileManipulator.UI
+namespace FileManipulator.ViewModels
 {
     public class FilesSelectorViewModel : ModelBase
     {
@@ -161,7 +161,7 @@ namespace FileManipulator.UI
                     dialog.NavigateToShortcut = true;
                     dialog.ShowHiddenItems = false;
 
-                    if (dialog.ShowDialog(App.Current.MainWindow) != CommonFileDialogResult.Ok) return;
+                    if (dialog.ShowDialog() != CommonFileDialogResult.Ok) return;
 
                     Directory = dialog.FileName;
                 }
@@ -180,7 +180,7 @@ namespace FileManipulator.UI
                     dialog.ShowHiddenItems = false;
                     dialog.EnsureReadOnly = false;
 
-                    if (dialog.ShowDialog(App.Current.MainWindow) != CommonFileDialogResult.Ok) return;
+                    if (dialog.ShowDialog() != CommonFileDialogResult.Ok) return;
 
                     if (dialog.FileNames.Count() < 1) return;
 

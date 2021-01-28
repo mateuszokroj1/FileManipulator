@@ -6,13 +6,12 @@ using FileManipulator.Models.Manipulator;
 
 namespace FileManipulator.ViewModels
 {
-    public class ManipulatorViewModel : ModelBase
+    public class ManipulatorViewModel : ViewModelWithModelProperty<Manipulator>
     {
-        public ManipulatorViewModel(Manipulator manipulator)
+        public ManipulatorViewModel(Manipulator manipulator) : base(manipulator)
         {
 
         }
 
-        public Manipulator Manipulator { get; }
     }
 }

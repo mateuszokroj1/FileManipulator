@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
+using FileManipulator.ViewModels;
+
 namespace FileManipulator.UI
 {
     public partial class MainView : Window
@@ -12,14 +14,17 @@ namespace FileManipulator.UI
 
             var model = DataContext as MainViewModel;
 
-            model.MessageOnCloseWhileTaskWorking = () =>//TODO
-                MessageBox.Show("", "", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
+            model.RenameDialog = new RenameWindow();
+
+            model.MessageOnCloseWhileTaskWorking = () =>
+                MessageBox.Show("Zadanie jest w stanie pracującym.\n\rCzy na pewno chcesz je zamknąć?\n\rNiektóre zmiany nie mogą być cofnięte.", "File Manipulator", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No)
+                == MessageBoxResult.Yes;
         }
 
-        public static readonly DependencyPropertyKey CloseCommandProperty = DependencyProperty.RegisterReadOnly(
+        public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register(
             "CloseCommand",
             typeof(ICommand),
-            typeof(MainView), new PropertyMetadata());
+            typeof(MainView));
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

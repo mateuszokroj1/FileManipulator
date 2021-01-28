@@ -10,7 +10,7 @@ using System.Windows.Input;
 using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Watcher;
 
-namespace FileManipulator.UI
+namespace FileManipulator.ViewModels
 
 {
     public class MainViewModel : ModelBase
@@ -19,16 +19,21 @@ namespace FileManipulator.UI
 
         public MainViewModel()
         {
+            TasksViewModel = new TasksViewModel(Tasks);
+
+            SelectedTaskChanged = CreatePropertyChangedObservable(nameof(SelectedTask), () => SelectedTask);
+
+            SelectedTaskChanged.Subscribe(value => TasksViewModel.SelectedItem = value);
+
+            TasksViewModel.SelectedItemChanged.Subscribe(value => SelectedTask = value);
+
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());
             CreateNewManipulatorTaskCommand = new Command(() => CreateNew<Manipulator>());
             HelpCommand = new Command(() => Process.Start(Path.Combine(Environment.CurrentDirectory, "Pomoc.docx")));
             
             EditTaskNameCommand = new ReactiveCommand(
-                Observable.FromEventPattern(this, "PropertyChanged")
-                .Select(args => (args.EventArgs as PropertyChangedEventArgs).PropertyName)
-                .Where(name => name == nameof(SelectedTask))
-                .Select(name => SelectedTask != null),
-                () => EditTaskName());
+                SelectedTaskChanged.Select(_ => SelectedTask != null),
+                () => EditTaskName(RenameDialog));
         }
 
         #endregion
@@ -43,11 +48,17 @@ namespace FileManipulator.UI
 
         public ObservableCollection<ITask> Tasks { get; set; } = new ObservableCollection<ITask>();
 
+        public TasksViewModel TasksViewModel { get; }
+
+        public ITextDialog RenameDialog { get; set; }
+
         public ITask SelectedTask
         {
             get => this.selectedTask;
             set => SetProperty(ref this.selectedTask, value);
         }
+
+        public IObservable<ITask> SelectedTaskChanged { get; }
 
         public bool IsAnyWorkingTasks =>
             Tasks
@@ -74,7 +85,7 @@ namespace FileManipulator.UI
             if (Tasks == null || Tasks.Count > 100)
                 return;
 
-            Task newTask;
+            ITask newTask;
             if (typeof(TaskType) == typeof(Watcher))
             {
                 newTask = new Watcher(Tasks);
@@ -90,14 +101,20 @@ namespace FileManipulator.UI
             SelectedTask = newTask;
         }
 
-        public void EditTaskName()
+        public void EditTaskName(ITextDialog window)
         {
+            if (window == null)
+                throw new ArgumentNullException(nameof(window));
+
             if (SelectedTask == null)
                 return;
 
-            RenameWindow window = new RenameWindow();
+            window.Value = SelectedTask.Name;
 
-            throw new NotImplementedException();//TODO
+            if (!window.ShowDialog())
+                return;
+
+            SelectedTask.Name = window.Value;
         }
 
         public async void Close(Func<bool> canClose, CancelEventArgs e)

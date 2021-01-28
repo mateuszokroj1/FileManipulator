@@ -60,7 +60,7 @@ namespace FileManipulator
                     OnPropertyChanged(name);
         }
 
-        protected IObservable<TValue> CreatePropertyChangedObservable<TValue>(string propertyName, Func<TValue> resultValue) =>
+        public IObservable<TValue> CreatePropertyChangedObservable<TValue>(string propertyName, Func<TValue> resultValue) =>
             PropertyChangedObservable.Where(name => name == propertyName).Select(_ => resultValue());
 
         #endregion

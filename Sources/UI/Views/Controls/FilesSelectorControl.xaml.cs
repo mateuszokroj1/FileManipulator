@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
+using FileManipulator.ViewModels;
+
 namespace FileManipulator.UI
 {
     /// <summary>

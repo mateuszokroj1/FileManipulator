@@ -9,9 +9,6 @@
              mc:Ignorable="d" 
              x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <core:TasksViewModel />
-    </UserControl.DataContext>
     <UserControl.Resources>
         <local:TasksViewTemplateSelector x:Key="TemplateSelector">
             <local:TasksViewTemplateSelector.WatcherTemplate>
@@ -40,7 +37,7 @@
     </UserControl.Resources>
     <Grid>
         <TabControl ItemsSource="{Binding TasksViewModels}"
-                    SelectedItem="{Binding SelectedItem, ElementName=Root, Mode=TwoWay}"
+                    SelectedItem="{Binding SelectedItem}"
                     ContentTemplateSelector="{StaticResource TemplateSelector}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
