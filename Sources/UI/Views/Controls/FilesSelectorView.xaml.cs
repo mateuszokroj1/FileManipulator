@@ -10,9 +10,9 @@ namespace FileManipulator.UI
     /// <summary>
     /// Logika interakcji dla klasy FilesSelectorControl.xaml
     /// </summary>
-    public partial class FilesSelectorControl : UserControl
+    public partial class FilesSelectorView : UserControl
     {
-        public FilesSelectorControl()
+        public FilesSelectorView()
         {
             InitializeComponent();
 
@@ -26,7 +26,7 @@ namespace FileManipulator.UI
         public static readonly DependencyProperty SelectedFilesProperty = DependencyProperty.Register(
             "SelectedFiles",
             typeof(IEnumerable<string>),
-            typeof(FilesSelectorControl),
+            typeof(FilesSelectorView),
             new PropertyMetadata(null)
         );
 
