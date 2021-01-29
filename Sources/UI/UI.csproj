@@ -93,8 +93,8 @@
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
     <Compile Include="Selectors\TasksViewTemplateSelector.cs" />
-    <Compile Include="Views\Controls\FilesSelectorControl.xaml.cs">
-      <DependentUpon>FilesSelectorControl.xaml</DependentUpon>
+    <Compile Include="Views\Controls\FilesSelectorView.xaml.cs">
+      <DependentUpon>FilesSelectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Windows\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
@@ -102,10 +102,10 @@
     <Compile Include="Views\ManipulatorView.xaml.cs">
       <DependentUpon>ManipulatorView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RenameWindow.xaml.cs">
+    <Compile Include="Views\Windows\RenameWindow.xaml.cs">
       <DependentUpon>RenameWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TasksLibraryWindow.xaml.cs">
+    <Compile Include="Views\Windows\TasksLibraryWindow.xaml.cs">
       <DependentUpon>TasksLibraryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TasksView.xaml.cs">
@@ -161,7 +161,7 @@
     <Folder Include="ViewModels\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Controls\FilesSelectorControl.xaml">
+    <Page Include="Views\Controls\FilesSelectorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -173,11 +173,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\RenameWindow.xaml">
+    <Page Include="Views\Windows\RenameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TasksLibraryWindow.xaml">
+    <Page Include="Views\Windows\TasksLibraryWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
