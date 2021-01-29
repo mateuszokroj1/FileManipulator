@@ -24,14 +24,16 @@ namespace FileManipulator.ViewModels
             PauseCommand = new ReactiveCommand(Model.CanPauseChanged, () => Pause());
             StopCommand = new ReactiveCommand(Model.CanStopChanged, () => Stop());
 
-            this.watcherObservable1 = Model.IncludeSubdirectoriesChanged
+            this.watcherObservers[0] = Model.IncludeSubdirectoriesChanged
             .ObserveOn(SynchronizationContext.Current)
             .Subscribe(_ => OnPropertyChanged(nameof(IncludeSubdirectories)));
 
-            this.watcherObservable2 = Model.StateChanged
+            this.watcherObservers[1] = Model.StateChanged
             .Subscribe(_ => OnPropertyChanged(nameof(CanEditSettings)));
 
             PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
+
+            this.watcherObservers[2] = PathChanged.Subscribe(_ => Model.Path = Path);
 
             IsDirectoryPath = true;
         }
@@ -43,10 +45,7 @@ namespace FileManipulator.ViewModels
         private bool isDirectoryPath;
         private string path;
         private bool includeSubdirectories;
-        private ICommand startCommand;
-        private ICommand pauseCommand;
-        private ICommand stopCommand;
-        private IDisposable watcherObservable1, watcherObservable2;
+        private readonly IDisposable[] watcherObservers = new IDisposable[3];
 
         #endregion
 
@@ -76,23 +75,11 @@ namespace FileManipulator.ViewModels
             set => SetProperty(ref this.isDirectoryPath, value);
         }
 
-        public ICommand StartCommand
-        {
-            get => this.startCommand;
-            set => SetProperty(ref this.startCommand, value);
-        }
+        public ICommand StartCommand { get; }
 
-        public ICommand PauseCommand
-        {
-            get => this.pauseCommand;
-            set => SetProperty(ref this.pauseCommand, value);
-        }
+        public ICommand PauseCommand { get; }
 
-        public ICommand StopCommand
-        {
-            get => this.stopCommand;
-            set => SetProperty(ref this.stopCommand, value);
-        }
+        public ICommand StopCommand { get; }
 
         public ICommand ClearCommand { get; }
 
@@ -187,8 +174,8 @@ namespace FileManipulator.ViewModels
 
         public void Dispose()
         {
-            this.watcherObservable1?.Dispose();
-            this.watcherObservable2?.Dispose();
+            foreach (var observer in this.watcherObservers)
+                observer?.Dispose();
         }
 
         #endregion
