@@ -8,47 +8,102 @@
              xmlns:core="clr-namespace:FileManipulator;assembly=FileManipulator.Core"
              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="255" d:DesignWidth="555" DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
         <local:EqualToBooleanConverter x:Key="Converter" />
+
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="10,5,5,5" />
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Padding" Value="10,5" />
+        </Style>
     </UserControl.Resources>
-    <StackPanel>
-        <RadioButton
-            Content="Katalog"
-            IsChecked="{Binding
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <RadioButton
+                Grid.Row="0"
+                Grid.Column="0"
+                Content="Katalog"
+                IsChecked="{Binding
                         SelectionType,
                         Mode=TwoWay,
                         Converter={StaticResource Converter},
                         ConverterParameter={x:Static core:SelectionType.Directory}
-            }"
-        />
-        <TextBox Visibility="Visible" Text="{Binding Directory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Button Command="{Binding BrowseCommand}">Wybierz...</Button>
-        <RadioButton
-            Content="Pliki"
-            IsChecked="{Binding
+                }"
+            />
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Visibility="Visible"
+                Text="{Binding Directory,
+                    Mode=TwoWay,
+                    UpdateSourceTrigger=PropertyChanged}"
+            />
+            <Button Grid.Column="1" Grid.Row="1" Command="{Binding BrowseCommand}">Wybierz...</Button>
+            <RadioButton
+                Grid.Row="2"
+                Grid.Column="0"
+                Content="Pliki"
+                IsChecked="{Binding
                         SelectionType,
                         Mode=TwoWay,
                         Converter={StaticResource Converter},
                         ConverterParameter={x:Static core:SelectionType.Files}
-            }"
-        />
-        <Grid>
+                }"
+            />
+        </Grid>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" MinHeight="50" />
+                <RowDefinition Height="*" MinHeight="200" />
             </Grid.RowDefinitions>
-            <ToolBar Grid.Row="0">
+            <ToolBar 
+                Grid.Row="0"
+                IsEnabled="{Binding SelectionType, Mode=TwoWay,
+                        Converter={StaticResource Converter},
+                        ConverterParameter={x:Static core:SelectionType.Files}}"
+            >
                 <Button Command="{Binding BrowseCommand}">Dodaj</Button>
                 <Button Command="{Binding DeleteCommand}">Usuń</Button>
                 <Button Command="{Binding ClearCommand}">Wyczyść</Button>
             </ToolBar>
-            <ListView Grid.Row="1" ItemsSource="{Binding Files, Mode=OneWay}" SelectedItem="{Binding SelectedFile}" SelectionMode="Single">
+            <ListView IsEnabled="{Binding
+                        SelectionType,
+                        Mode=TwoWay,
+                        Converter={StaticResource Converter},
+                        ConverterParameter={x:Static core:SelectionType.Files}}"
+                      Grid.Row="1"
+                      ItemsSource="{Binding Files}"
+                      SelectedItem="{Binding SelectedFile}"
+                      SelectionMode="Single"
+            >
                 <ListView.InputBindings>
                     <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
                     <KeyBinding Key="Insert" Command="{Binding BrowseCommand}" />
                 </ListView.InputBindings>
             </ListView>
         </Grid>
-    </StackPanel>
+    </Grid>
 </UserControl>

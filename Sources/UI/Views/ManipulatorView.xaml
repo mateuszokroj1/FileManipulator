@@ -20,42 +20,59 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel>
-            <Expander Header="Wybór plików">
-                
-            </Expander>
-            <Expander Header="Filtracja nazw plików">
-                <ListBox>
-                    
-                </ListBox>
-            </Expander>
-            <Expander Header="Filtracja treści plików (tekstowych)">
-                <ListBox>
-                    
-                </ListBox>
-            </Expander>
-            <Expander Header="Grupowa zmiana nazw plików">
-                <ListBox>
-                    
-                </ListBox>
-            </Expander>
-            <Expander Header="Manipulacja treścią">
-                <ListBox>
-                    
-                </ListBox>
-            </Expander>
-            <Expander Header="Wybór miejsca docelowego">
-                <Grid>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
+            <StackPanel>
+                <Expander IsExpanded="True" Header="Wybór plików">
+                    <local:FilesSelectorView DataContext="{Binding FilesSelectorViewModel}" />
+                </Expander>
+                <Expander Header="Filtracja nazw plików">
+                    <ListBox ItemsSource="{Binding NameFilters}">
 
-                </Grid>
-            </Expander>
-        </StackPanel>
+                    </ListBox>
+                </Expander>
+                <Expander Header="Filtracja treści plików (tekstowych)">
+                    <ListBox ItemsSource="{Binding ContentFilters}">
+
+                    </ListBox>
+                </Expander>
+                <Expander Header="Grupowa zmiana nazw plików">
+                    <ListBox ItemsSource="{Binding NameManipulations}">
+
+                    </ListBox>
+                </Expander>
+                <Expander Header="Manipulacja treścią">
+                    <ListBox ItemsSource="{Binding ContentManipulations}">
+
+                    </ListBox>
+                </Expander>
+                <Expander Header="Wybór miejsca docelowego">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Row="0" Margin="10,5" Grid.Column="0" IsChecked="{Binding IsMoving}">Przenieś do nowego folderu</CheckBox>
+                        <TextBox Grid.Row="1" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="13" Grid.Column="0" IsEnabled="{Binding IsMoving}" />
+                        <Button Grid.Row="1" Grid.Column="1" Margin="10" Padding="10,5" IsEnabled="{Binding IsMoving}">Wybierz</Button>
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
         <StackPanel Grid.Row="1">
-            <Grid>
-                <Button Padding="10,3,10,3" HorizontalAlignment="Center">Start</Button>
+            <Grid Margin="15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Padding="20,5" HorizontalAlignment="Center">Start</Button>
+                <Button Grid.Column="1" Padding="10,0" HorizontalAlignment="Center">Stop</Button>
             </Grid>
             <StatusBar>
-                <Label />
+                <Label Content="{Binding Progress.Status}" />
             </StatusBar>
         </StackPanel>
     </Grid>

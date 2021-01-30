@@ -17,23 +17,17 @@ namespace FileManipulator.ViewModels
 
         public FilesSelectorViewModel()
         {
-            this.propertyChangedObservable = 
-                Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>
-                (
-                    handler => PropertyChanged += handler,
-                    handler => PropertyChanged -= handler
-                )
-                .Where(args => !string.IsNullOrWhiteSpace(args?.EventArgs?.PropertyName))
-                .Select(args => args.EventArgs.PropertyName);
-
             BrowseCommand = new Command(() => Browse());
             DeleteCommand = new ReactiveCommand(
-               this.propertyChangedObservable
+               PropertyChangedObservable
                .Where(name => name == nameof(SelectedFile))
                .Select(n => Files.Contains(SelectedFile)),
                () => DeleteSelectedFile()
             );
             ClearCommand = new Command(() => ClearList());
+
+            PropertyChangedObservable.Where(name => name == nameof(Directory) || name == nameof(SelectionType))
+                .Subscribe(_ => RefreshList());
         }
 
         #endregion
@@ -45,7 +39,6 @@ namespace FileManipulator.ViewModels
         private bool isDirectoryValid;
         private bool isFilesValid;
         private string selectedFile;
-        private IObservable<string> propertyChangedObservable;
 
         #endregion
 
@@ -54,7 +47,7 @@ namespace FileManipulator.ViewModels
         public SelectionType SelectionType
         {
             get => this.selectionType;
-            set => SetProperty(ref this.selectionType, value, nameof(SelectionType), nameof(SelectedFiles));
+            set => SetProperty(ref this.selectionType, value);
         }
 
         public ObservableCollection<string> Files { get; } = new ObservableCollection<string>();
@@ -68,7 +61,7 @@ namespace FileManipulator.ViewModels
         public string Directory
         {
             get => this.directory;
-            set => SetProperty(ref this.directory, value, nameof(Directory), nameof(SelectedFiles));
+            set => SetProperty(ref this.directory, value, nameof(Directory));
         }
 
         public bool IsDirectoryValid
@@ -83,66 +76,48 @@ namespace FileManipulator.ViewModels
             private set => SetProperty(ref this.isFilesValid, value);
         }
 
-        public IEnumerable<string> SelectedFiles => Generate();
-
         public ICommand BrowseCommand { get; }
 
         public ICommand DeleteCommand { get; }
 
         public ICommand ClearCommand { get; }
 
+        public Func<bool> RequiredAdministratorForThisFiles { get; set; }
+
         #endregion
 
         #region Methods
 
-        public IEnumerable<string> Generate()
+        private void RefreshList()
         {
-            switch(SelectionType)
+            Files.Clear();
+
+            if (SelectionType != SelectionType.Directory)
+                return;
+
+            if (!string.IsNullOrEmpty(Directory) && System.IO.Directory.Exists(Directory))
             {
-                case SelectionType.Directory:
-                    if(!string.IsNullOrEmpty(Directory) && System.IO.Directory.Exists(Directory))
+                if(CheckIsRequiredAdministratorPrivileges(Directory))
+                {
+                    if (!RequiredAdministratorForThisFiles())
                     {
-                        IEnumerable<string> files;
+                        Directory = null;
+                        return;
+                    }
+                }
 
-                        try
-                        {
-                            files = System.IO.Directory.EnumerateFiles(Directory, "", SearchOption.TopDirectoryOnly);
-                            IsDirectoryValid = true;
-                            return files;
-                        }
-                        catch(Exception)
-                        {
-                            IsDirectoryValid = false;
-                            return Enumerable.Empty<string>();
-                        }
-                    }
-                    else
-                    {
-                        IsDirectoryValid = false;
-                        return Enumerable.Empty<string>();
-                    }
-                case SelectionType.Files:
-                    foreach (var path in Files)
-                    {
-                        try
-                        {
-                            if (!File.Exists(path))
-                            {
-                                IsFilesValid = false;
-                                return Enumerable.Empty<string>();
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            IsFilesValid = false;
-                            return Enumerable.Empty<string>();
-                        }
-                    }
-
-                    IsFilesValid = true;
-                    return Files;
-                default:
-                    return Enumerable.Empty<string>();
+                try
+                {
+                    foreach (var file in System.IO.Directory.EnumerateFiles(Directory, "*", SearchOption.TopDirectoryOnly))
+                        Files.Add(file);
+                    
+                    IsDirectoryValid = true;
+                }
+                catch (Exception)
+                {
+                    IsDirectoryValid = false;
+                    return;
+                }
             }
         }
 
@@ -186,15 +161,24 @@ namespace FileManipulator.ViewModels
 
                     try
                     {
-                        if (dialog.FileNames.Where(file => !File.Exists(file)).Count() > 0) return;
+                        if (dialog.FileNames.Where(file => !File.Exists(file))?.Count() > 0)
+                            return;
                     }
-                    catch(Exception)
+                    catch(IOException)
                     {
                         return;
                     }
 
                     foreach (var file in dialog.FileNames)
+                    {
+                        if (CheckIsRequiredAdministratorPrivileges(file))
+                        {
+                            if(!RequiredAdministratorForThisFiles())
+                                return;
+                        }
+
                         Files.Add(file);
+                    }
                 }
             }
         }
@@ -203,6 +187,28 @@ namespace FileManipulator.ViewModels
         {
             if (Files.Contains(SelectedFile))
                 Files.Remove(SelectedFile);
+        }
+
+        private bool CheckIsRequiredAdministratorPrivileges(string path)
+        {
+            var startsWithPaths = new string[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.AdminTools),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonAdminTools),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms),
+                Environment.GetFolderPath(Environment.SpecialFolder.System),
+                Environment.GetFolderPath(Environment.SpecialFolder.SystemX86),
+                Environment.GetFolderPath(Environment.SpecialFolder.Windows)
+            };
+
+            return startsWithPaths
+                .Where(searched => path.StartsWith(searched, StringComparison.InvariantCultureIgnoreCase))
+                .Count() > 0;
         }
 
         public void ClearList() => Files.Clear();

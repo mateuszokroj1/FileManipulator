@@ -10,24 +10,8 @@ namespace FileManipulator
 
         public TaskProgress()
         {
-            this.propertyChangedObservable =
-                Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>
-                (
-                    handler => PropertyChanged += handler,
-                    handler => PropertyChanged -= handler
-                )
-                .Where(args => !string.IsNullOrWhiteSpace(args?.EventArgs?.PropertyName))
-                .Select(args => args.EventArgs.PropertyName);
-
-            OnValueChanged =
-                this.propertyChangedObservable
-                .Where(propertyName => propertyName == nameof(ProgressValue))
-                .Select(p => ProgressValue);
-
-            OnStatusChanged =
-                this.propertyChangedObservable
-                .Where(propertyName => propertyName == nameof(Status))
-                .Select(p => Status);
+            ProgressValueChanged = CreatePropertyChangedObservable(nameof(ProgressValue), () => ProgressValue);
+            StatusChanged = CreatePropertyChangedObservable(nameof(Status), () => Status);
         }
 
         #endregion
@@ -36,8 +20,6 @@ namespace FileManipulator
 
         private float progressValue;
         private string status;
-
-        private readonly IObservable<string> propertyChangedObservable;
 
         #endregion
 
@@ -55,9 +37,9 @@ namespace FileManipulator
             set => SetProperty(ref this.progressValue, value);
         }
 
-        public IObservable<float> OnValueChanged { get; }
+        public IObservable<float> ProgressValueChanged { get; }
 
-        public IObservable<string> OnStatusChanged { get; }
+        public IObservable<string> StatusChanged { get; }
 
         #endregion
 
