@@ -93,7 +93,10 @@ namespace FileManipulator.ViewModels
             Files.Clear();
 
             if (SelectionType != SelectionType.Directory)
+            {
+                Directory = null;
                 return;
+            }
 
             if (!string.IsNullOrEmpty(Directory) && System.IO.Directory.Exists(Directory))
             {
@@ -194,7 +197,8 @@ namespace FileManipulator.ViewModels
             var startsWithPaths = new string[]
             {
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.ExpandEnvironmentVariables("%ProgramW6432%"),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 Environment.GetFolderPath(Environment.SpecialFolder.AdminTools),
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonAdminTools),
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),

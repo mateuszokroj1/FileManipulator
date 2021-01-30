@@ -60,8 +60,20 @@
                 Text="{Binding Directory,
                     Mode=TwoWay,
                     UpdateSourceTrigger=PropertyChanged}"
+                IsEnabled="{Binding SelectionType, Mode=TwoWay,
+                        Converter={StaticResource Converter},
+                        ConverterParameter={x:Static core:SelectionType.Directory}}"
             />
-            <Button Grid.Column="1" Grid.Row="1" Command="{Binding BrowseCommand}">Wybierz...</Button>
+            <Button
+                Grid.Column="1"
+                Grid.Row="1"
+                Command="{Binding BrowseCommand}"
+                IsEnabled="{Binding SelectionType, Mode=TwoWay,
+                        Converter={StaticResource Converter},
+                        ConverterParameter={x:Static core:SelectionType.Directory}}"
+            >
+                Wybierz...
+            </Button>
             <RadioButton
                 Grid.Row="2"
                 Grid.Column="0"
