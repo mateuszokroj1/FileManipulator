@@ -51,12 +51,15 @@ namespace FileManipulator.ViewModels
 
         public ICommand StartCommand { get; }
         public ICommand StopCommand { get; }
+        public ICommand BrowseCommand { get; }
 
         public FilesSelectorViewModel FilesSelectorViewModel { get; } = new FilesSelectorViewModel();
 
         public bool CanStart { get; }//TODO
         public bool CanStop { get; }
         public bool CanEdit => Model.State == TaskState.Ready;
+
+        public TaskProgress Progress => Model.Progress;
 
         public IObservable<bool> CanStartChanged { get; }
         public IObservable<bool> CanStopChanged { get; }
