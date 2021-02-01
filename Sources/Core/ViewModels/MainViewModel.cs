@@ -28,7 +28,7 @@ namespace FileManipulator.ViewModels
 
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());
             CreateNewManipulatorTaskCommand = new Command(() => CreateNew<Manipulator>());
-            HelpCommand = new Command(() => Process.Start(Path.Combine(Environment.CurrentDirectory, "Pomoc.docx")));
+            HelpCommand = new Command(() => OpenHelp());
             
             EditTaskNameCommand = new ReactiveCommand(
                 SelectedItemChanged.Select(_ => SelectedItem != null),
@@ -97,7 +97,6 @@ namespace FileManipulator.ViewModels
                 throw new InvalidOperationException("Invalid task type.");
 
             Tasks.Add(newTask);
-            //TasksViewModel.SelectTask(newTask);
         }
 
         public void EditTaskName(ITextDialog window)
@@ -116,6 +115,22 @@ namespace FileManipulator.ViewModels
                 return;
 
             task.Name = window.Value;
+        }
+
+        public void OpenHelp()
+        {
+            var path = Path.Combine(Environment.CurrentDirectory, "Pomoc.docx");
+
+            if (!File.Exists(path)) return;
+
+            try
+            {
+                Process.Start(path);
+            }
+            catch(Win32Exception) // When not setted default app for DOCX
+            {
+                Process.Start("explorer.exe", $"/select, \"{path}\"");
+            }
         }
 
         public async void Close(Func<bool> canClose, CancelEventArgs e)
