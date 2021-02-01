@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
+
+using FileManipulator.ViewModels;
+
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace FileManipulator.UI
 {
@@ -23,6 +14,32 @@ namespace FileManipulator.UI
         public ManipulatorView()
         {
             InitializeComponent();
+        }
+
+        private void UserControl_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            if(DataContext is ManipulatorViewModel model)
+            {
+                model.GetDirectoryFromDialog = input =>
+                {
+                    using (var dialog = new CommonOpenFileDialog())
+                    {
+                        dialog.IsFolderPicker = true;
+                        dialog.ShowHiddenItems = false;
+                        dialog.AllowNonFileSystemItems = false;
+                        dialog.Title = "Wybierz miejsce docelowe";
+                        dialog.InitialDirectory = input;
+                        dialog.EnsureReadOnly = false;
+                        dialog.Multiselect = false;
+                        dialog.NavigateToShortcut = true;
+
+                        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                            return input;
+
+                        return dialog.FileName;
+                    }
+                };
+            }
         }
     }
 }

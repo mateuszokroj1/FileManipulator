@@ -6,36 +6,69 @@
              xmlns:local="clr-namespace:FileManipulator.UI"
              mc:Ignorable="d"
              Background="{x:Static SystemColors.ControlBrush}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
-        <Style TargetType="Expander">
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="Padding" Value="3" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="#ccc" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ManipulatorDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Expander">
+                <Setter Property="Margin" Value="2" />
+                <Setter Property="Padding" Value="3" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="#ccc" />
+            </Style>
+            <Style TargetType="Button" x:Key="AddButtonStyle">
+                <Setter Property="Content" Value="+" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Padding" Value="0,2" />
+                <Setter Property="Margin" Value="0,0,0,4" />
+                <Setter Property="BorderBrush" Value="Gray" />
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
+        <ScrollViewer
+            IsEnabled="{Binding CanEdit}"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Visible"
+        >
             <StackPanel>
                 <Expander IsExpanded="True" Header="Wybór plików">
                     <local:FilesSelectorView DataContext="{Binding FilesSelectorViewModel}" />
                 </Expander>
                 <Expander Header="Filtracja nazw plików">
-                    <ListBox ItemsSource="{Binding NameFilters}"/>
+                    <StackPanel>
+                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ListBox ItemsSource="{Binding NameFilters}"/>
+                    </StackPanel>
                 </Expander>
                 <Expander Header="Filtracja treści plików (tekstowych)">
-                    <ListBox ItemsSource="{Binding ContentFilters}"/>
+                    <StackPanel>
+                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ListBox ItemsSource="{Binding ContentFilters}"/>
+                    </StackPanel>
                 </Expander>
                 <Expander Header="Grupowa zmiana nazw plików">
-                    <ListBox ItemsSource="{Binding NameManipulations}"/>
+                    <StackPanel>
+                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ListBox ItemsSource="{Binding NameManipulations}"/>
+                    </StackPanel>
                 </Expander>
                 <Expander Header="Manipulacja treścią">
-                    <ListBox ItemsSource="{Binding ContentManipulations}"/>
+                    <StackPanel>
+                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ListBox ItemsSource="{Binding ContentManipulations}"/>
+                    </StackPanel>
                 </Expander>
                 <Expander Header="Wybór miejsca docelowego">
                     <Grid>
@@ -47,9 +80,32 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Row="0" Margin="10,5" Grid.Column="0" IsChecked="{Binding IsMoving}">Przenieś do nowego folderu</CheckBox>
-                        <TextBox Grid.Row="1" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="13" Grid.Column="0" IsEnabled="{Binding IsMoving}" />
-                        <Button Grid.Row="1" Grid.Column="1" Margin="10" Padding="10,5" IsEnabled="{Binding IsMoving}">Wybierz</Button>
+                        <CheckBox
+                            Grid.Row="0"
+                            Margin="10,5"
+                            Grid.Column="0"
+                            IsChecked="{Binding IsMoving}"
+                        >
+                            Przenieś do nowego folderu
+                        </CheckBox>
+                        <TextBox
+                            Grid.Row="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Grid.Column="0"
+                            IsEnabled="{Binding IsMoving}"
+                        />
+                        <Button
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10"
+                            Padding="10,5"
+                            IsEnabled="{Binding IsMoving}"
+                            Command="{Binding BrowseCommand}"
+                         >
+                            Wybierz
+                        </Button>
                     </Grid>
                 </Expander>
             </StackPanel>
@@ -60,8 +116,22 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Padding="20,5" HorizontalAlignment="Center">Start</Button>
-                <Button Grid.Column="1" Padding="10,0" HorizontalAlignment="Center">Stop</Button>
+                <Button
+                    Grid.Column="0"
+                    Padding="20,5"
+                    HorizontalAlignment="Center"
+                    Command="{Binding StartCommand}"
+                 >
+                    Start
+                </Button>
+                <Button
+                    Grid.Column="1"
+                    Padding="10,0"
+                    HorizontalAlignment="Center"
+                    Command="{Binding StopCommand}"
+                >
+                    Stop
+                </Button>
             </Grid>
             <StatusBar>
                 <Label Content="{Binding Progress.Status}" />
