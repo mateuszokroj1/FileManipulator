@@ -135,11 +135,11 @@ namespace FileManipulator.ViewModels
         {
             if(SelectedItem is WatcherViewModel watcherModel)
             {
-
+                watcherModel.Model.Close();
             }
             else if(SelectedItem is ManipulatorViewModel manipulatorModel)
             {
-
+                manipulatorModel.Model.Close();
             }
         }
 
