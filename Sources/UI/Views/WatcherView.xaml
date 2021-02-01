@@ -56,9 +56,9 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="Ścieżka" Width="Auto" DisplayMemberBinding="{Binding Path}" />
-                        <GridViewColumn Header="Czas akcji" Width="Auto" DisplayMemberBinding="{Binding Time}" />
-                        <GridViewColumn Header="Typ akcji" Width="Auto" DisplayMemberBinding="{Binding ActionType}" />
+                        <GridViewColumn Header="Ścieżka" Width="300" DisplayMemberBinding="{Binding Path}" />
+                        <GridViewColumn Header="Czas akcji" Width="150" DisplayMemberBinding="{Binding Time}" />
+                        <GridViewColumn Header="Typ akcji" Width="150" DisplayMemberBinding="{Binding ActionType}" />
                     </GridView.Columns>
                 </GridView>
             </ListView.View>
