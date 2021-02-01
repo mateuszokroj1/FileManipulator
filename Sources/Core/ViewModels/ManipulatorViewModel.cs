@@ -10,7 +10,7 @@ using FileManipulator.Models.Manipulator.Manipulations;
 
 namespace FileManipulator.ViewModels
 {
-    public class ManipulatorViewModel : ViewModelWithModelProperty<Manipulator>
+    public class ManipulatorViewModel : ViewModelWithModelProperty<Manipulator>, IManipulatorViewModel
     {
         #region Constructor
 
@@ -55,9 +55,9 @@ namespace FileManipulator.ViewModels
 
         public FilesSelectorViewModel FilesSelectorViewModel { get; } = new FilesSelectorViewModel();
 
-        public bool CanStart { get; }//TODO
-        public bool CanStop { get; }
-        public bool CanEdit => Model.State == TaskState.Ready;
+        public bool CanStart => Model.State == TaskState.Ready;
+        public bool CanStop => Model.State == TaskState.Working || Model.State == TaskState.Paused;
+        public bool CanEdit => CanStart && !CanStop;
 
         public TaskProgress Progress => Model.Progress;
 
@@ -68,6 +68,21 @@ namespace FileManipulator.ViewModels
         #endregion
 
         #region Methods
+
+        public void Start()
+        {
+
+        }
+
+        public void Stop()
+        {
+
+        }
+
+        public void Browse()
+        {
+
+        }
 
         #endregion
     }
