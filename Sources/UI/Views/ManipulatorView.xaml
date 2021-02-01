@@ -26,24 +26,16 @@
                     <local:FilesSelectorView DataContext="{Binding FilesSelectorViewModel}" />
                 </Expander>
                 <Expander Header="Filtracja nazw plików">
-                    <ListBox ItemsSource="{Binding NameFilters}">
-
-                    </ListBox>
+                    <ListBox ItemsSource="{Binding NameFilters}"/>
                 </Expander>
                 <Expander Header="Filtracja treści plików (tekstowych)">
-                    <ListBox ItemsSource="{Binding ContentFilters}">
-
-                    </ListBox>
+                    <ListBox ItemsSource="{Binding ContentFilters}"/>
                 </Expander>
                 <Expander Header="Grupowa zmiana nazw plików">
-                    <ListBox ItemsSource="{Binding NameManipulations}">
-
-                    </ListBox>
+                    <ListBox ItemsSource="{Binding NameManipulations}"/>
                 </Expander>
                 <Expander Header="Manipulacja treścią">
-                    <ListBox ItemsSource="{Binding ContentManipulations}">
-
-                    </ListBox>
+                    <ListBox ItemsSource="{Binding ContentManipulations}"/>
                 </Expander>
                 <Expander Header="Wybór miejsca docelowego">
                     <Grid>
