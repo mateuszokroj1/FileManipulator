@@ -230,10 +230,10 @@ namespace FileManipulator.Models.Manipulator
                     Stopping.OnNext(new TaskEventArgs(this));
                     await StopAsync();
                     Stopped.OnNext(new TaskEventArgs(this));
-
-                    State = TaskState.Ready;
-                    LastError = null;
                 }
+
+                State = TaskState.Ready;
+                LastError = null;
             }, null);
 
             this.cancellationTokenSource = new CancellationTokenSource();

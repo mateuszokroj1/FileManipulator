@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.Reactive.Linq;
 using System.Windows.Input;
 
 using FileManipulator.Models.Manipulator;
@@ -16,7 +16,27 @@ namespace FileManipulator.ViewModels
 
         public ManipulatorViewModel(Manipulator manipulator) : base(manipulator)
         {
+            StateChanged = Model.CreatePropertyChangedObservable(nameof(Model.State), () => Model.State);
+            CanStartChanged = CreatePropertyChangedObservable(nameof(CanStart), () => CanStart);
+            CanStopChanged = CreatePropertyChangedObservable(nameof(CanStop), () => CanStop);
+            CanEditChanged = CreatePropertyChangedObservable(nameof(CanEdit), () => CanEdit);
 
+            StateChanged.Subscribe(_ =>
+            {
+                OnPropertyChanged(nameof(CanStart));
+                OnPropertyChanged(nameof(CanStop));
+                OnPropertyChanged(nameof(CanEdit));
+            });
+
+            CreatePropertyChangedObservable(nameof(OutputDirectory), () => OutputDirectory)
+                .Subscribe(_ => OnPropertyChanged(nameof(CanStart)));
+
+            CreatePropertyChangedObservable(nameof(CanStart), () => CanStart)
+                .Merge(CreatePropertyChangedObservable(nameof(CanStop), () => CanStop))
+                .Subscribe(_ => OnPropertyChanged(nameof(CanEdit)));
+
+            StartCommand = new ReactiveCommand(CanStartChanged, () => Start());
+            StopCommand = new ReactiveCommand(CanStopChanged, () => Stop());
         }
 
         #endregion
@@ -55,15 +75,20 @@ namespace FileManipulator.ViewModels
 
         public FilesSelectorViewModel FilesSelectorViewModel { get; } = new FilesSelectorViewModel();
 
-        public bool CanStart => Model.State == TaskState.Ready;
+        public bool CanStart => Model.State == TaskState.Ready &&
+            InputPaths.Count > 0 &&
+            ((!IsMoving) || (IsMoving && !string.IsNullOrWhiteSpace(OutputDirectory)));
         public bool CanStop => Model.State == TaskState.Working || Model.State == TaskState.Paused;
-        public bool CanEdit => CanStart && !CanStop;
+        public bool CanEdit => Model.State == TaskState.Ready;
 
         public TaskProgress Progress => Model.Progress;
 
         public IObservable<bool> CanStartChanged { get; }
         public IObservable<bool> CanStopChanged { get; }
         public IObservable<bool> CanEditChanged { get; }
+        public IObservable<TaskState> StateChanged { get; }
+
+        public Func<string,string> GetDirectoryFromDialog { get; set; }
 
         #endregion
 
@@ -81,7 +106,7 @@ namespace FileManipulator.ViewModels
 
         public void Browse()
         {
-
+            OutputDirectory = GetDirectoryFromDialog(OutputDirectory);
         }
 
         #endregion
