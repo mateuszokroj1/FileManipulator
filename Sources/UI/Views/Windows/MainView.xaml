@@ -26,8 +26,8 @@
                     <MenuItem Header="Watcher" Command="{Binding CreateNewWatcherTaskCommand}" />
                     <MenuItem Header="Manipulator" Command="{Binding CreateNewManipulatorTaskCommand}" />
                 </MenuItem>
-                <MenuItem Header="Edytuj nazwę zadania" />
-                <MenuItem Header="Zakończ zadanie" />
+                <MenuItem Header="Edytuj nazwę zadania" Command="{Binding EditTaskNameCommand}" />
+                <MenuItem Header="Zakończ zadanie"  />
                 <Separator/>
                 <MenuItem Header="Otwórz bibliotekę zadań..." />
             </MenuItem>

@@ -15,7 +15,7 @@ namespace FileManipulator.UI
 
             var model = DataContext as MainViewModel;
 
-            model.RenameDialog = new RenameWindow();
+            model.RenameDialogAction = RenameAction;
 
             model.MessageOnCloseWhileTaskWorking = () =>
                 MessageBox.Show("Zadanie jest w stanie pracującym.\n\rCzy na pewno chcesz je zamknąć?\n\rNiektóre zmiany nie mogą być cofnięte.", "File Manipulator", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No)
@@ -26,6 +26,17 @@ namespace FileManipulator.UI
             "CloseCommand",
             typeof(ICommand),
             typeof(MainView));
+
+        private string RenameAction(string name)
+        {
+            var window = new RenameWindow();
+            window.Value = name;
+
+            if (!(window.ShowDialog() ?? false))
+                return name;
+
+            return window.Name;
+        }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

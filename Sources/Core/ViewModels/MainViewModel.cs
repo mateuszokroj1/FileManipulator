@@ -32,7 +32,11 @@ namespace FileManipulator.ViewModels
             
             EditTaskNameCommand = new ReactiveCommand(
                 SelectedItemChanged.Select(_ => SelectedItem != null),
-                () => EditTaskName(RenameDialog));
+                () => EditTaskName());
+
+            CloseTaskCommand = new ReactiveCommand(
+                SelectedItemChanged.Select(_ => SelectedItem != null),
+                () => CloseTask());
         }
 
         #endregion
@@ -48,8 +52,6 @@ namespace FileManipulator.ViewModels
         public ObservableCollection<ITask> Tasks { get; set; } = new ObservableCollection<ITask>();
 
         public TasksViewModel TasksViewModel { get; }
-
-        public ITextDialog RenameDialog { get; set; }
 
         public IViewModelWithModelProperty SelectedItem
         {
@@ -70,9 +72,13 @@ namespace FileManipulator.ViewModels
 
         public ICommand EditTaskNameCommand { get; }
 
+        public ICommand CloseTaskCommand { get; }
+
         public ICommand HelpCommand { get; }
 
         public Func<bool> MessageOnCloseWhileTaskWorking { get; set; }
+
+        public Func<string,string> RenameDialogAction { get; set; }
 
         #endregion
 
@@ -99,22 +105,14 @@ namespace FileManipulator.ViewModels
             Tasks.Add(newTask);
         }
 
-        public void EditTaskName(ITextDialog window)
+        public void EditTaskName()
         {
-            if (window == null)
-                throw new ArgumentNullException(nameof(window));
-
             if (SelectedItem == null)
                 return;
 
             ITask task = TasksViewModel.GetSelectedTask();
 
-            window.Value = task.Name;
-
-            if (!window.ShowDialog())
-                return;
-
-            task.Name = window.Value;
+            task.Name = RenameDialogAction(task.Name);
         }
 
         public void OpenHelp()
@@ -130,6 +128,18 @@ namespace FileManipulator.ViewModels
             catch(Win32Exception) // When not setted default app for DOCX
             {
                 Process.Start("explorer.exe", $"/select, \"{path}\"");
+            }
+        }
+
+        public void CloseTask()
+        {
+            if(SelectedItem is WatcherViewModel watcherModel)
+            {
+
+            }
+            else if(SelectedItem is ManipulatorViewModel manipulatorModel)
+            {
+
             }
         }
 

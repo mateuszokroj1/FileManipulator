@@ -6,20 +6,20 @@
         xmlns:local="clr-namespace:FileManipulator.UI"
         mc:Ignorable="d"
         x:Name="Window"
-        Title="Zmień nazwę" Height="165" Width="393" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="ToolWindow">
+        Title="Zmień nazwę" WindowStartupLocation="CenterOwner" SizeToContent="Height" Width="450" ResizeMode="NoResize" WindowStyle="ToolWindow" KeyDown="Window_KeyDown" Activated="Window_Activated">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="35*"/>
-            <RowDefinition Height="56*"/>
-            <RowDefinition Height="46*"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Margin="127,4,127,5" Width="133">Zmień nazwę elementu</Label>
-        <TextBox x:Name="Text" FontSize="18" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="100,17" Text="{Binding Value, ElementName=Window, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="TextBox_LostFocus" Height="22" />
-        <Button IsDefault="True" Grid.Row="2" Grid.Column="0" Padding="5" VerticalAlignment="Center" HorizontalAlignment="Center" Height="28" Margin="74,9" Width="46">Zapisz</Button>
-        <Button IsCancel="True" Grid.Row="2" Grid.Column="1" Padding="5,0" VerticalAlignment="Center" HorizontalAlignment="Center" Height="18" Margin="74,14,73,14" Width="46">Anuluj</Button>
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="127,4,127,5">Zmień nazwę elementu</Label>
+        <TextBox x:Name="Text" FontSize="15" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="100,17" LostFocus="TextBox_LostFocus" />
+        <Button IsDefault="True" Grid.Row="2" Grid.Column="0" Padding="5" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="74,9" Click="Button_Click">Zapisz</Button>
+        <Button IsCancel="True" Grid.Row="2" Grid.Column="1" Padding="5,0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="74,14,73,14">Anuluj</Button>
     </Grid>
 </Window>
