@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Manipulator.Filters;
+using FileManipulator.Models.Manipulator.Filters.NameFilters;
 using FileManipulator.Models.Manipulator.Manipulations;
 
 namespace FileManipulator.ViewModels
@@ -16,12 +17,11 @@ namespace FileManipulator.ViewModels
 
         public ManipulatorViewModel(Manipulator manipulator) : base(manipulator)
         {
-            StateChanged = Model.CreatePropertyChangedObservable(nameof(Model.State), () => Model.State);
             CanStartChanged = CreatePropertyChangedObservable(nameof(CanStart), () => CanStart);
             CanStopChanged = CreatePropertyChangedObservable(nameof(CanStop), () => CanStop);
             CanEditChanged = CreatePropertyChangedObservable(nameof(CanEdit), () => CanEdit);
 
-            StateChanged.Subscribe(_ =>
+            Model.StateChanged.Subscribe(_ =>
             {
                 OnPropertyChanged(nameof(CanStart));
                 OnPropertyChanged(nameof(CanStop));
@@ -31,12 +31,11 @@ namespace FileManipulator.ViewModels
             CreatePropertyChangedObservable(nameof(OutputDirectory), () => OutputDirectory)
                 .Subscribe(_ => OnPropertyChanged(nameof(CanStart)));
 
-            CreatePropertyChangedObservable(nameof(CanStart), () => CanStart)
-                .Merge(CreatePropertyChangedObservable(nameof(CanStop), () => CanStop))
-                .Subscribe(_ => OnPropertyChanged(nameof(CanEdit)));
-
             StartCommand = new ReactiveCommand(CanStartChanged, () => Start());
             StopCommand = new ReactiveCommand(CanStopChanged, () => Stop());
+
+            AddFilterCommand = new ReactiveCommand(CanEditChanged, type => AddFilter(type as Type));
+            AddManipulationCommand = new ReactiveCommand(CanEditChanged, type => AddManipulation(type as Type));
         }
 
         #endregion
@@ -72,6 +71,8 @@ namespace FileManipulator.ViewModels
         public ICommand StartCommand { get; }
         public ICommand StopCommand { get; }
         public ICommand BrowseCommand { get; }
+        public ICommand AddFilterCommand { get; }
+        public ICommand AddManipulationCommand { get; }
 
         public FilesSelectorViewModel FilesSelectorViewModel { get; } = new FilesSelectorViewModel();
 
@@ -107,6 +108,19 @@ namespace FileManipulator.ViewModels
         public void Browse()
         {
             OutputDirectory = GetDirectoryFromDialog(OutputDirectory);
+        }
+
+        public void AddFilter(Type type)
+        {
+            if (typeof(ClassicSorting) == type)
+                Model.Filters.Add(new ClassicSorting());
+            else if (typeof(AlphanumericSorting) == type)
+                Model.Filters.Add(new AlphanumericSorting());
+        }
+
+        public void AddManipulation(Type type)
+        {
+
         }
 
         #endregion

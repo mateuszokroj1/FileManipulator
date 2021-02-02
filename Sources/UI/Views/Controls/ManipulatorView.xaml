@@ -4,15 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManipulator.UI"
+             xmlns:nameFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.NameFilters;assembly=FileManipulator.Core"
              mc:Ignorable="d"
              Background="{x:Static SystemColors.ControlBrush}"
              d:DesignHeight="450" d:DesignWidth="800" DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ManipulatorDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="Expander">
+        <Style TargetType="Expander">
                 <Setter Property="Margin" Value="2" />
                 <Setter Property="Padding" Value="3" />
                 <Setter Property="BorderThickness" Value="1" />
@@ -30,7 +27,6 @@
                 <Setter Property="BorderBrush" Value="Gray" />
                 <Setter Property="BorderThickness" Value="1" />
             </Style>
-        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -48,7 +44,10 @@
                 </Expander>
                 <Expander Header="Filtracja nazw plików">
                     <StackPanel>
-                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ToolBar>
+                            <Button Content="Sortowanie alfabetyczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:ClassicSorting}" />
+                            <Button Content="Sortowanie alfanumeryczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:AlphanumericSorting}" />
+                        </ToolBar>
                         <ListBox ItemsSource="{Binding NameFilters}"/>
                     </StackPanel>
                 </Expander>
