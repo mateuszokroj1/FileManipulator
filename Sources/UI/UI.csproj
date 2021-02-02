@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\EqualToBooleanConverter.cs" />
+    <Compile Include="Converters\SortModeConverter.cs" />
     <Compile Include="Converters\SubTaskStateToColorConverter.cs" />
     <Compile Include="Messages.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -102,6 +103,9 @@
     </Compile>
     <Compile Include="Views\Controls\Manipulator\Filters\ClassicSorting.xaml.cs">
       <DependentUpon>ClassicSorting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\Manipulator\Filters\RegexSearcher.xaml.cs">
+      <DependentUpon>RegexSearcher.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\SubTaskStateControl.xaml.cs">
       <DependentUpon>SubTaskStateControl.xaml</DependentUpon>
@@ -181,6 +185,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\Manipulator\Filters\ClassicSorting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Manipulator\Filters\RegexSearcher.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -8,31 +8,42 @@
              xmlns:manipulator="clr-namespace:FileManipulator.Models.Manipulator;assembly=FileManipulator.Core"
              xmlns:nameFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.NameFilters;assembly=FileManipulator.Core"
              mc:Ignorable="d" 
-             Background="#FFF1F1F1"
-             BorderThickness="1"
-             BorderBrush="#FFAEAEAE"
+             Style="{StaticResource SubTaskControlStyle}"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <main:SortModeConverter x:Key="Converter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0">
-            <TextBlock Background="#FFCFCFCF" Padding="0,3,0,3" FontFamily="Arial" FontWeight="Bold" TextAlignment="Center">Sortowanie alfanumeryczne</TextBlock>
+            <TextBlock Style="{StaticResource SubTaskTitle}">Sortowanie alfanumeryczne</TextBlock>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Label VerticalAlignment="Center" Grid.Column="0">Tryb sortowania:</Label>
-                <ComboBox Grid.Column="1" Margin="5" ItemsSource="{x:Static nameFilters:AlphanumericSorting.SortModesSource}" SelectedItem="{Binding SortMode}" />
+                <ComboBox
+                    Grid.Column="1"
+                    Margin="5"
+                    IsEditable="False" 
+                    SelectedItem="{Binding SortMode, Converter={StaticResource Converter}}"
+                    ItemsSource="{x:Static nameFilters:AlphanumericSorting.SortModesSource}"
+                />
             </Grid>
         </StackPanel>
-        <StackPanel VerticalAlignment="Center" Grid.Column="1" Orientation="Vertical">
-            <Button FontFamily="Webdings" FontSize="11">
-                r<!-- Close sign in Webdings font -->
-            </Button>
-            <main:SubTaskStateControl Width="20" Height="20" DataContext="{Binding State}" />
-        </StackPanel>
+        <main:SubTaskStateControl
+            Grid.Column="1"
+            DataContext="{Binding State}"
+        />
+        <Button
+            Style="{StaticResource CloseButton}"
+            Command="{Binding CloseCommand}"
+            Grid.Column="2"
+        />
     </Grid>
 </UserControl>

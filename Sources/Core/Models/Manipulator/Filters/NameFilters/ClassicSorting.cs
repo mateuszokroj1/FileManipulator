@@ -23,7 +23,7 @@ namespace FileManipulator.Models.Manipulator.Filters.NameFilters
             set => SetProperty(ref this.sortMode, value);
         }
 
-        public static IEnumerable<SortMode> SortModesSource { get; } = Enum.GetValues(typeof(SortMode)).Cast<SortMode>();
+        public static IEnumerable<string> SortModesSource { get; } = new string[] { "Rosnąco", "Malejąco" };
 
         public async Task<IEnumerable<ISourceFileInfo>> FilterAsync(IEnumerable<ISourceFileInfo> inputList)
         {

@@ -17,7 +17,7 @@ namespace FileManipulator.Models.Manipulator.Filters.NameFilters
         private SortMode sortMode;
         private readonly ICollection<IFilter> collection;
 
-        public static IEnumerable<SortMode> SortModesSource { get; } = Enum.GetValues(typeof(SortMode)).Cast<SortMode>();
+        public static IEnumerable<string> SortModesSource { get; } = new string[] { "Rosnąco", "Malejąco" };
 
         public SortMode SortMode
         {
