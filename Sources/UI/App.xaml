@@ -4,4 +4,7 @@
              xmlns:local="clr-namespace:FileManipulator.UI"
              ShutdownMode="OnMainWindowClose"
              StartupUri="Views/Windows/MainView.xaml">
+    <Application.Resources>
+        <ResourceDictionary Source="Views/Controls/Manipulator/ManipulatorDictionary.xaml" />
+    </Application.Resources>
 </Application>
