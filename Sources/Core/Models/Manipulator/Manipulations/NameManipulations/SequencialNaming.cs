@@ -1,0 +1,132 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+
+using FileManipulator.Models.Manipulator.FileInfos;
+
+namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
+{
+    public class SequencialNaming : SubTask, INameManipulation
+    {
+        public SequencialNaming(ICollection<IManipulation> collection)
+        {
+            this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
+        }
+
+        private readonly ICollection<IManipulation> collection;
+        private bool addPrefix, addSuffix, indexing;
+        private string prefix, suffix, separateWith;
+        private uint startNumber, increment, fixedPlaces;
+
+        public bool AddPrefix
+        {
+            get => this.addPrefix;
+            set => SetProperty(ref this.addPrefix, value);
+        }
+
+        public string Prefix
+        {
+            get => this.prefix;
+            set => SetProperty(ref this.prefix, value);
+        }
+
+        public bool AddSuffix
+        {
+            get => this.addSuffix;
+            set => SetProperty(ref this.addSuffix, value);
+        }
+
+        public string Suffix
+        {
+            get => this.suffix;
+            set => SetProperty(ref this.suffix, value);
+        }
+
+        public bool Indexing
+        {
+            get => this.indexing;
+            set => SetProperty(ref this.indexing, value);
+        }
+
+        public uint StartNumber
+        {
+            get => this.startNumber;
+            set => SetProperty(ref this.startNumber, value);
+        }
+
+        public uint Increment
+        {
+            get => this.increment;
+            set => SetProperty(ref this.increment, value);
+        }
+
+        public uint FixedPlaces
+        {
+            get => this.fixedPlaces;
+            set => SetProperty(ref this.fixedPlaces, value);
+        }
+
+        public string SeparateWith
+        {
+            get => this.separateWith;
+            set => SetProperty(ref this.separateWith, value);
+        }
+
+        public async Task<IEnumerable<IDestinationFileInfo>> ManipulateAsync(IEnumerable<IDestinationFileInfo> inputFiles)
+        {
+            var outputList = new List<IDestinationFileInfo>();
+
+            uint currentIndex = StartNumber;
+
+            foreach(var fileInfo in inputFiles)
+            {
+                var newInfo = new DestinationFileInfo
+                {
+                    IsTextFile = fileInfo.IsTextFile,
+                    SourceFileName = fileInfo.SourceFileName,
+                    SourceFileContent = fileInfo.SourceFileContent,
+                    DestinationFileContent = fileInfo.DestinationFileContent,
+                };
+
+                var filename = Path.GetFileNameWithoutExtension(fileInfo.DestinationFileName);
+
+                var builder = new StringBuilder();
+
+                if (AddPrefix && Prefix != null)
+                    builder.Append(Prefix);
+
+                builder.Append(filename);
+
+                if(Indexing)
+                {
+                    builder.Append(SeparateWith ?? string.Empty);
+
+                    var number = currentIndex.ToString();
+                    number = number.PadLeft((int)FixedPlaces, '0');
+                    builder.Append(number);
+
+                    currentIndex += Increment;
+                }
+
+                if (AddSuffix && Suffix != null)
+                    builder.Append(Suffix);
+
+                newInfo.DestinationFileName = Path.Combine(
+                    Path.GetDirectoryName(fileInfo.DestinationFileName),
+                    builder.ToString(),
+                    Path.GetExtension(fileInfo.DestinationFileName));
+
+                outputList.Add(newInfo);
+            }
+
+            return outputList;
+        }
+
+        public override void Close()
+        {
+            this.collection.Remove(this);
+        }
+    }
+}

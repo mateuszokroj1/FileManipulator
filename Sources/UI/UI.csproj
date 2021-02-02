@@ -107,6 +107,9 @@
     <Compile Include="Views\Controls\Manipulator\Filters\RegexSearcher.xaml.cs">
       <DependentUpon>RegexSearcher.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\Manipulator\Manipulations\Replace.xaml.cs">
+      <DependentUpon>Replace.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Controls\SubTaskStateControl.xaml.cs">
       <DependentUpon>SubTaskStateControl.xaml</DependentUpon>
     </Compile>
@@ -173,7 +176,6 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="ViewModels\" />
-    <Folder Include="Views\Controls\Manipulator\Manipulations\" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\Controls\FilesSelectorView.xaml">
@@ -189,6 +191,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\Manipulator\Filters\RegexSearcher.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Manipulator\Manipulations\Replace.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
