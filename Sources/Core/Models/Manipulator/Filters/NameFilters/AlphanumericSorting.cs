@@ -7,11 +7,17 @@ using FileManipulator.Models.Manipulator.FileInfos;
 
 namespace FileManipulator.Models.Manipulator.Filters.NameFilters
 {
-    public class AlphanumericSorting : SubTask, INameFilter
+    public sealed class AlphanumericSorting : SubTask, INameFilter
     {
-        private SortMode sortMode;
+        public AlphanumericSorting(ICollection<IFilter> subTaskCollection)
+        {
+            this.collection = subTaskCollection ?? throw new ArgumentNullException(nameof(subTaskCollection));
+        }
 
-        public IEnumerable<SortMode> SortModesSource { get; } = Enum.GetValues(typeof(SortMode)).Cast<SortMode>();
+        private SortMode sortMode;
+        private readonly ICollection<IFilter> collection;
+
+        public static IEnumerable<SortMode> SortModesSource { get; } = Enum.GetValues(typeof(SortMode)).Cast<SortMode>();
 
         public SortMode SortMode
         {
@@ -27,6 +33,11 @@ namespace FileManipulator.Models.Manipulator.Filters.NameFilters
                 return inputList.OrderByDescending(item => item.SourceFileName, new AlphanumericComparer());
             else
                 throw new InvalidOperationException("Invalid parameter value: SortMode.");
+        }
+
+        public override void Close()
+        {
+            this.collection.Remove(this);
         }
     }
 }

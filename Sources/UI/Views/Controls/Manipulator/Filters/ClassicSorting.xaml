@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManipulator.UI.Views.Controls.Manipulator.Filters"
+             xmlns:nameFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.NameFilters;assembly=FileManipulator.Core"
              mc:Ignorable="d" 
              Background="#FFF1F1F1"
              BorderThickness="1"
@@ -17,7 +18,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Label VerticalAlignment="Center" Grid.Column="0">Tryb sortowania:</Label>
-            <ComboBox Grid.Column="1" Margin="5" ItemsSource="{Binding SortModesSource}" SelectedItem="{Binding SortMode}" />
+            <ComboBox Grid.Column="1" Margin="5" ItemsSource="{x:Static nameFilters:ClassicSorting.SortModesSource}" SelectedItem="{Binding SortMode}" />
         </Grid>
     </StackPanel>
 </UserControl>

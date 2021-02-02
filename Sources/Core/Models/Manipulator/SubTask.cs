@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+using System.Windows.Input;
 
 namespace FileManipulator.Models.Manipulator
 {
@@ -10,6 +9,8 @@ namespace FileManipulator.Models.Manipulator
         protected SubTask()
         {
             StateChanged = CreatePropertyChangedObservable(nameof(State), () => State);
+
+            CloseCommand = new Command(() => Close());
         }
 
         private SubTaskState state;
@@ -22,8 +23,10 @@ namespace FileManipulator.Models.Manipulator
 
         public IObservable<SubTaskState> StateChanged { get; }
 
+        public ICommand CloseCommand { get; }
+
         public SynchronizationContext SynchronizationContext { get; } = SynchronizationContext.Current;
 
-
+        public abstract void Close();
     }
 }

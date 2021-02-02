@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\EqualToBooleanConverter.cs" />
+    <Compile Include="Converters\SubTaskStateToColorConverter.cs" />
     <Compile Include="Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -101,6 +102,9 @@
     </Compile>
     <Compile Include="Views\Controls\Manipulator\Filters\ClassicSorting.xaml.cs">
       <DependentUpon>ClassicSorting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\SubTaskStateControl.xaml.cs">
+      <DependentUpon>SubTaskStateControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Windows\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
@@ -181,6 +185,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\Manipulator\ManipulatorDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\SubTaskStateControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
