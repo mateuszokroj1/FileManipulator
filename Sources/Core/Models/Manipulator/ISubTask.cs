@@ -11,5 +11,7 @@ namespace FileManipulator.Models.Manipulator
         IObservable<SubTaskState> StateChanged { get; }
 
         SynchronizationContext SynchronizationContext { get; }
+
+        void Close();
     }
 }

@@ -53,7 +53,10 @@
                 </Expander>
                 <Expander Header="Filtracja treści plików (tekstowych)">
                     <StackPanel>
-                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ToolBar>
+                            <Button Content="Sortowanie alfabetyczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:ClassicSorting}" />
+                            <Button Content="Sortowanie alfanumeryczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:AlphanumericSorting}" />
+                        </ToolBar>
                         <ListBox ItemsSource="{Binding ContentFilters}"/>
                     </StackPanel>
                 </Expander>

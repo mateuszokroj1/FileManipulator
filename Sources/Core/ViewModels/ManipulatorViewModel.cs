@@ -34,8 +34,8 @@ namespace FileManipulator.ViewModels
             StartCommand = new ReactiveCommand(CanStartChanged, () => Start());
             StopCommand = new ReactiveCommand(CanStopChanged, () => Stop());
 
-            AddFilterCommand = new ReactiveCommand(CanEditChanged, type => AddFilter(type as Type));
-            AddManipulationCommand = new ReactiveCommand(CanEditChanged, type => AddManipulation(type as Type));
+            AddFilterCommand = new Command(type => AddFilter(type as Type));
+            AddManipulationCommand = new Command(type => AddManipulation(type as Type));
         }
 
         #endregion
@@ -113,9 +113,9 @@ namespace FileManipulator.ViewModels
         public void AddFilter(Type type)
         {
             if (typeof(ClassicSorting) == type)
-                Model.Filters.Add(new ClassicSorting());
+                Model.Filters.Add(new ClassicSorting(Model.Filters));
             else if (typeof(AlphanumericSorting) == type)
-                Model.Filters.Add(new AlphanumericSorting());
+                Model.Filters.Add(new AlphanumericSorting(Model.Filters));
         }
 
         public void AddManipulation(Type type)
