@@ -96,6 +96,12 @@
     <Compile Include="Views\Controls\FilesSelectorView.xaml.cs">
       <DependentUpon>FilesSelectorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Controls\Manipulator\Filters\AlphanumericSorting.xaml.cs">
+      <DependentUpon>AlphanumericSorting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\Manipulator\Filters\ClassicSorting.xaml.cs">
+      <DependentUpon>ClassicSorting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Windows\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -159,10 +165,18 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="ViewModels\" />
-    <Folder Include="Views\Controls\Manipulator\" />
+    <Folder Include="Views\Controls\Manipulator\Manipulations\" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\Controls\FilesSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Manipulator\Filters\AlphanumericSorting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Manipulator\Filters\ClassicSorting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
