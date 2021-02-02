@@ -46,9 +46,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Manipulator\Manipulations\NameManipulations\" />
-    <Folder Include="Models\Manipulator\Manipulations\ContentManipulations\" />
-  </ItemGroup>
-
 </Project>
