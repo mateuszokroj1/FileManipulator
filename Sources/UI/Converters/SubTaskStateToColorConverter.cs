@@ -12,7 +12,7 @@ namespace FileManipulator.UI
     {
         public static readonly Dictionary<SubTaskState, SolidColorBrush> Values = new Dictionary<SubTaskState, SolidColorBrush>
         {
-            { SubTaskState.Ready, new SolidColorBrush(Colors.Transparent) },
+            { SubTaskState.Ready, new SolidColorBrush(Color.FromRgb(170,170,170)) },
             { SubTaskState.Pending, new SolidColorBrush(Color.FromRgb(41, 106, 194)) },
             { SubTaskState.Working, new SolidColorBrush(Color.FromRgb(238, 194, 0)) },
             { SubTaskState.Done, new SolidColorBrush(Color.FromRgb(90, 220, 0)) }

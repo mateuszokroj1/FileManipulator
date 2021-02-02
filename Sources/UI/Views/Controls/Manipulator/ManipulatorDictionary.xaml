@@ -1,12 +1,52 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:namefilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.NameFilters;assembly=FileManipulator.Core"
+                    xmlns:nameFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.NameFilters;assembly=FileManipulator.Core"
+                    xmlns:contentFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.ContentFilters;assembly=FileManipulator.Core"
                     xmlns:filtersView="clr-namespace:FileManipulator.UI.Views.Controls.Manipulator.Filters">
-    <DataTemplate DataType="{x:Type namefilters:ClassicSorting}">
+    
+    <!-- Styles -->
+
+    <Style TargetType="Button" x:Key="CloseButton">
+        <Setter Property="Content" Value="r" />
+        <Setter Property="FontFamily" Value="Webdings" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="SubTaskTitle">
+        <Setter Property="Background" Value="#FFCFCFCF" />
+        <Setter Property="Padding" Value="0,3" />
+        <Setter Property="FontFamily" Value="Arial" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+
+    <Style TargetType="UserControl" x:Key="SubTaskControlStyle">
+        <Setter Property="Background" Value="#FFF1F1F1" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#FFAEAEAE" />
+    </Style>
+
+    <!-- Templates -->
+    
+    <DataTemplate DataType="{x:Type nameFilters:ClassicSorting}">
         <filtersView:ClassicSorting DataContext="{Binding}" />
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type namefilters:AlphanumericSorting}">
+    <DataTemplate DataType="{x:Type nameFilters:AlphanumericSorting}">
         <filtersView:AlphanumericSorting DataContext="{Binding}" />
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type nameFilters:RegexSearcher}">
+        <filtersView:RegexSearcher DataContext="{Binding}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type contentFilters:RegexSearcher}">
+        <filtersView:RegexSearcher DataContext="{Binding}" />
+    </DataTemplate>
+
 </ResourceDictionary>

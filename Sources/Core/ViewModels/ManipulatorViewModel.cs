@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 
@@ -26,6 +28,42 @@ namespace FileManipulator.ViewModels
                 OnPropertyChanged(nameof(CanStart));
                 OnPropertyChanged(nameof(CanStop));
                 OnPropertyChanged(nameof(CanEdit));
+            });
+
+            Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                handler => Model.Filters.CollectionChanged += handler,
+                handler => Model.Filters.CollectionChanged -= handler
+            )
+            .Subscribe(_ =>
+            {
+                NameFilters = Model.Filters
+                    .Select(filter => filter as INameFilter)
+                    .Where(filter => filter != null);
+
+                ContentFilters = Model.Filters
+                    .Select(filter => filter as IContentFilter)
+                    .Where(filter => filter != null);
+
+                OnPropertyChanged(nameof(NameFilters));
+                OnPropertyChanged(nameof(ContentFilters));
+            });
+
+            Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                handler => Model.Manipulations.CollectionChanged += handler,
+                handler => Model.Manipulations.CollectionChanged -= handler
+            )
+            .Subscribe(_ =>
+            {
+                NameManipulations = Model.Manipulations
+                    .Select(filter => filter as INameManipulation)
+                    .Where(filter => filter != null);
+
+                ContentManipulations = Model.Manipulations
+                    .Select(filter => filter as IContentManipulation)
+                    .Where(filter => filter != null);
+
+                OnPropertyChanged(nameof(NameManipulations));
+                OnPropertyChanged(nameof(ContentManipulations));
             });
 
             CreatePropertyChangedObservable(nameof(OutputDirectory), () => OutputDirectory)
@@ -116,6 +154,10 @@ namespace FileManipulator.ViewModels
                 Model.Filters.Add(new ClassicSorting(Model.Filters));
             else if (typeof(AlphanumericSorting) == type)
                 Model.Filters.Add(new AlphanumericSorting(Model.Filters));
+            else if (typeof(RegexSearcher) == type)
+                Model.Filters.Add(new RegexSearcher(Model.Filters));
+            else if (typeof(Models.Manipulator.Filters.ContentFilters.RegexSearcher) == type)
+                Model.Filters.Add(new Models.Manipulator.Filters.ContentFilters.RegexSearcher(Model.Filters));
         }
 
         public void AddManipulation(Type type)
