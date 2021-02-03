@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
@@ -23,15 +22,27 @@ namespace FileManipulator.ViewModels
             CanStartChanged = CreatePropertyChangedObservable(nameof(CanStart), () => CanStart);
             CanStopChanged = CreatePropertyChangedObservable(nameof(CanStop), () => CanStop);
             CanEditChanged = CreatePropertyChangedObservable(nameof(CanEdit), () => CanEdit);
+            OutputDirectoryChanged = CreatePropertyChangedObservable(nameof(OutputDirectory), () => OutputDirectory);
+            IsMovingChanged = CreatePropertyChangedObservable(nameof(IsMoving), () => IsMoving);
 
-            Model.StateChanged.Subscribe(_ =>
+            this.disposables[0] = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                handler => FilesSelectorViewModel.Files.CollectionChanged += handler,
+                handler => FilesSelectorViewModel.Files.CollectionChanged -= handler
+            )
+            .Subscribe(_ =>
+            {
+                Model.FilePaths = FilesSelectorViewModel.Files;
+                OnPropertyChanged(nameof(CanStart));
+            });
+
+            this.disposables[1] = Model.StateChanged.Subscribe(_ =>
             {
                 OnPropertyChanged(nameof(CanStart));
                 OnPropertyChanged(nameof(CanStop));
                 OnPropertyChanged(nameof(CanEdit));
             });
 
-            Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+            this.disposables[2] = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
                 handler => Model.Filters.CollectionChanged += handler,
                 handler => Model.Filters.CollectionChanged -= handler
             )
@@ -49,7 +60,7 @@ namespace FileManipulator.ViewModels
                 OnPropertyChanged(nameof(ContentFilters));
             });
 
-            Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+            this.disposables[3] = Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
                 handler => Model.Manipulations.CollectionChanged += handler,
                 handler => Model.Manipulations.CollectionChanged -= handler
             )
@@ -67,8 +78,14 @@ namespace FileManipulator.ViewModels
                 OnPropertyChanged(nameof(ContentManipulations));
             });
 
-            CreatePropertyChangedObservable(nameof(OutputDirectory), () => OutputDirectory)
-                .Subscribe(_ => OnPropertyChanged(nameof(CanStart)));
+            this.disposables[4] = OutputDirectoryChanged.Subscribe(_ =>
+            {
+                Model.DestinationDir = IsMoving ? OutputDirectory : null;
+            });
+            this.disposables[5] = IsMovingChanged.Subscribe(_ =>
+            {
+                Model.DestinationDir = IsMoving ? OutputDirectory : null;
+            });
 
             StartCommand = new ReactiveCommand(CanStartChanged, () => Start());
             StopCommand = new ReactiveCommand(CanStopChanged, () => Stop());
@@ -83,12 +100,11 @@ namespace FileManipulator.ViewModels
 
         private bool isMoving;
         private string outputDirectory;
+        private readonly IDisposable[] disposables = new IDisposable[6];
 
         #endregion
 
         #region Properties
-
-        public ObservableCollection<string> InputPaths { get; } = new ObservableCollection<string>();
 
         public bool IsMoving
         {
@@ -116,7 +132,7 @@ namespace FileManipulator.ViewModels
         public FilesSelectorViewModel FilesSelectorViewModel { get; } = new FilesSelectorViewModel();
 
         public bool CanStart => Model.State == TaskState.Ready &&
-            InputPaths.Count > 0 &&
+            FilesSelectorViewModel.Files.Count > 0 &&
             ((!IsMoving) || (IsMoving && !string.IsNullOrWhiteSpace(OutputDirectory)));
         public bool CanStop => Model.State == TaskState.Working || Model.State == TaskState.Paused;
         public bool CanEdit => Model.State == TaskState.Ready;
@@ -127,6 +143,8 @@ namespace FileManipulator.ViewModels
         public IObservable<bool> CanStopChanged { get; }
         public IObservable<bool> CanEditChanged { get; }
         public IObservable<TaskState> StateChanged { get; }
+        public IObservable<string> OutputDirectoryChanged { get; }
+        public IObservable<bool> IsMovingChanged { get; }
 
         public Func<string,string> GetDirectoryFromDialog { get; set; }
 
@@ -136,12 +154,12 @@ namespace FileManipulator.ViewModels
 
         public void Start()
         {
-
+            Model.StartAsync();
         }
 
         public void Stop()
         {
-
+            Model.StopAsync();
         }
 
         public void Browse()
@@ -169,6 +187,12 @@ namespace FileManipulator.ViewModels
                 Model.Manipulations.Add(new Replace(Model.Manipulations));
             else if (typeof(SequentialNaming) == type)
                 Model.Manipulations.Add(new SequentialNaming(Model.Manipulations));
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in this.disposables)
+                disposable?.Dispose();
         }
 
         #endregion

@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\EqualToBooleanConverter.cs" />
+    <Compile Include="Converters\RegexConverter.cs" />
     <Compile Include="Converters\SortModeConverter.cs" />
     <Compile Include="Converters\SubTaskStateToColorConverter.cs" />
     <Compile Include="Messages.Designer.cs">
