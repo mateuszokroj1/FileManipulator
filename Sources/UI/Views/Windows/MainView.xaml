@@ -29,8 +29,8 @@
                 <MenuItem Header="Edytuj nazwę zadania" Command="{Binding EditTaskNameCommand}" />
                 <MenuItem Header="Zakończ zadanie" Command="{Binding CloseTaskCommand}" />
                 <Separator/>
-                <MenuItem Header="Wczytaj zadanie z pliku..." />
-                <MenuItem Header="Zapisz wybrane zadanie do pliku..." />
+                <MenuItem Header="Wczytaj zadanie z pliku..." Command="{Binding LoadTaskFromFileCommand}" />
+                <MenuItem Header="Zapisz wybrane zadanie do pliku..." Command="{Binding SaveTaskToFileCommand}" />
             </MenuItem>
             <MenuItem Header="Pomoc" Command="{Binding HelpCommand}" />
             <MenuItem Header="Zamknij aplikację" Command="{Binding CloseCommand, ElementName=Window}" />
