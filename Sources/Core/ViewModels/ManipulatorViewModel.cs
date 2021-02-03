@@ -155,6 +155,9 @@ namespace FileManipulator.ViewModels
 
         public void Start()
         {
+            if (!MainViewModel.ConfirmationOnStart())
+                return;
+
             Model.StartAsync();
         }
 

@@ -96,6 +96,8 @@ namespace FileManipulator.ViewModels
 
         public Func<string,string> RenameDialogAction { get; set; }
 
+        public static Func<bool> ConfirmationOnStart { get; set; }
+
         #endregion
 
         #region Methods
