@@ -89,6 +89,7 @@ namespace FileManipulator.ViewModels
 
             StartCommand = new ReactiveCommand(CanStartChanged, () => Start());
             StopCommand = new ReactiveCommand(CanStopChanged, () => Stop());
+            BrowseCommand = new Command(() => Browse());
 
             AddFilterCommand = new Command(type => AddFilter(type as Type));
             AddManipulationCommand = new Command(type => AddManipulation(type as Type));

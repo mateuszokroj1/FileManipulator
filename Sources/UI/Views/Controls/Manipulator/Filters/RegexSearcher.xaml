@@ -29,7 +29,7 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     Margin="4"
-                    Text="{Binding Regex, Mode=TwoWay, Converter={StaticResource Converter}, Delay=1000, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{Binding Regex, Mode=TwoWay, Converter={StaticResource Converter}, Delay=500, UpdateSourceTrigger=PropertyChanged}"
                     FontSize="13" />
             </Grid>
         </StackPanel>
