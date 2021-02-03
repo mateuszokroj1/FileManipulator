@@ -13,6 +13,11 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
         public SequentialNaming(ICollection<IManipulation> collection)
         {
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
+
+            StartNumber = 1;
+            Increment = 1;
+            FixedPlaces = 1;
+            SeparateWith = string.Empty;
         }
 
         private readonly ICollection<IManipulation> collection;
