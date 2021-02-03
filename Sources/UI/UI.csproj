@@ -107,8 +107,14 @@
     <Compile Include="Views\Controls\Manipulator\Filters\RegexSearcher.xaml.cs">
       <DependentUpon>RegexSearcher.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Controls\Manipulator\Manipulations\Replace.xaml.cs">
-      <DependentUpon>Replace.xaml</DependentUpon>
+    <Compile Include="Views\Controls\Manipulator\Manipulations\ReplaceContent.xaml.cs">
+      <DependentUpon>ReplaceContent.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\Manipulator\Manipulations\ReplaceName.xaml.cs">
+      <DependentUpon>ReplaceName.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Controls\Manipulator\Manipulations\SequentialNaming.xaml.cs">
+      <DependentUpon>SequentialNaming.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Controls\SubTaskStateControl.xaml.cs">
       <DependentUpon>SubTaskStateControl.xaml</DependentUpon>
@@ -194,7 +200,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Controls\Manipulator\Manipulations\Replace.xaml">
+    <Page Include="Views\Controls\Manipulator\Manipulations\ReplaceContent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Manipulator\Manipulations\ReplaceName.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\Manipulator\Manipulations\SequentialNaming.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

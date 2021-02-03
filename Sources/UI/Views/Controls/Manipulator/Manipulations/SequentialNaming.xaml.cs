@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace FileManipulator.UI.Views.Controls.Manipulator.Manipulations
 {
     /// <summary>
-    /// Logika interakcji dla klasy Replace.xaml
+    /// Logika interakcji dla klasy SequentialNaming.xaml
     /// </summary>
-    public partial class Replace : UserControl
+    public partial class SequentialNaming : UserControl
     {
-        public Replace()
+        public SequentialNaming()
         {
             InitializeComponent();
         }

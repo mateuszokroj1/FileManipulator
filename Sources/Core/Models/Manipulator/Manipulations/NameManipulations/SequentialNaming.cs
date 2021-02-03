@@ -8,15 +8,15 @@ using FileManipulator.Models.Manipulator.FileInfos;
 
 namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
 {
-    public class SequencialNaming : SubTask, INameManipulation
+    public class SequentialNaming : SubTask, INameManipulation
     {
-        public SequencialNaming(ICollection<IManipulation> collection)
+        public SequentialNaming(ICollection<IManipulation> collection)
         {
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
         }
 
         private readonly ICollection<IManipulation> collection;
-        private bool addPrefix, addSuffix, indexing;
+        private bool addPrefix, addSuffix, isIndexing;
         private string prefix, suffix, separateWith;
         private uint startNumber, increment, fixedPlaces;
 
@@ -44,10 +44,10 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             set => SetProperty(ref this.suffix, value);
         }
 
-        public bool Indexing
+        public bool IsIndexing
         {
-            get => this.indexing;
-            set => SetProperty(ref this.indexing, value);
+            get => this.isIndexing;
+            set => SetProperty(ref this.isIndexing, value);
         }
 
         public uint StartNumber
@@ -99,7 +99,7 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
 
                 builder.Append(filename);
 
-                if(Indexing)
+                if(IsIndexing)
                 {
                     builder.Append(SeparateWith ?? string.Empty);
 

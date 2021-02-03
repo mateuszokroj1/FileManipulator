@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="FileManipulator.UI.Views.Controls.Manipulator.Manipulations.ReplaceContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:main="clr-namespace:FileManipulator.UI"
+             xmlns:local="clr-namespace:FileManipulator.UI.Views.Controls.Manipulator.Manipulations"
+             mc:Ignorable="d" 
+             x:Name="Root"
+             Style="{StaticResource SubTaskControlStyle}" d:DesignWidth="800" Height="141">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0">
+            <TextBlock Style="{StaticResource SubTaskTitle}">Znajdź i zamień</TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Label VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">Do znalezienia:</Label>
+                <TextBox
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Margin="10"
+                    IsEnabled="{Binding IsTextBoxEnabled, ElementName=Root}"
+                    Text="{Binding From, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    FontSize="13"
+                />
+                <Label VerticalAlignment="Center" Grid.Column="0" Grid.Row="1">Zamień na:</Label>
+                <TextBox
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Margin="10"
+                    Text="{Binding To, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    FontSize="13"
+                />
+            </Grid>
+        </StackPanel>
+        <main:SubTaskStateControl
+            Grid.Column="1"
+            DataContext="{Binding State}"
+        />
+        <Button
+            Style="{StaticResource CloseButton}"
+            Command="{Binding CloseCommand}"
+            Grid.Column="2"
+        />
+    </Grid>
+</UserControl>

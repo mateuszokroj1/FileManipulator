@@ -10,6 +10,7 @@ using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Manipulator.Filters;
 using FileManipulator.Models.Manipulator.Filters.NameFilters;
 using FileManipulator.Models.Manipulator.Manipulations;
+using FileManipulator.Models.Manipulator.Manipulations.NameManipulations;
 
 namespace FileManipulator.ViewModels
 {
@@ -162,7 +163,12 @@ namespace FileManipulator.ViewModels
 
         public void AddManipulation(Type type)
         {
-
+            if (typeof(Models.Manipulator.Manipulations.ContentManipulations.Replace) == type)
+                Model.Manipulations.Add(new Models.Manipulator.Manipulations.ContentManipulations.Replace(Model.Manipulations));
+            else if (typeof(Replace) == type)
+                Model.Manipulations.Add(new Replace(Model.Manipulations));
+            else if (typeof(SequentialNaming) == type)
+                Model.Manipulations.Add(new SequentialNaming(Model.Manipulations));
         }
 
         #endregion
