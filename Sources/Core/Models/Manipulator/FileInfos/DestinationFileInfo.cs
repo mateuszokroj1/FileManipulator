@@ -7,13 +7,19 @@
         public DestinationFileInfo(ISourceFileInfo fileInfo)
         {
             SourceFileName = fileInfo.SourceFileName;
-            SourceFileContent = fileInfo.SourceFileContent;
+            SourceFileContent = null;
             IsTextFile = fileInfo.IsTextFile;
 
             DestinationFileName = SourceFileName;
 
-            if (IsTextFile)
-                DestinationFileContent = SourceFileContent.ReadToEnd();
+            if (IsTextFile && fileInfo.SourceFileContent?.BaseStream?.Length > 0)
+            {
+                fileInfo.SourceFileContent.BaseStream.Position = 0;
+                DestinationFileContent = fileInfo.SourceFileContent.ReadToEnd();
+            }
+
+            fileInfo.SourceFileContent.BaseStream.Close();
+            fileInfo.SourceFileContent.Dispose();
         }
 
         public string DestinationFileName { get; set; }

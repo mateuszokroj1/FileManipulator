@@ -35,7 +35,7 @@ namespace FileManipulator.UI
             if (!(window.ShowDialog() ?? false))
                 return name;
 
-            return window.Name;
+            return window.Value;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

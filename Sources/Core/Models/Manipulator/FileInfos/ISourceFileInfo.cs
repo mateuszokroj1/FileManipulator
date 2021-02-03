@@ -6,7 +6,7 @@ namespace FileManipulator.Models.Manipulator.FileInfos
     {
         string SourceFileName { get; }
 
-        StreamReader SourceFileContent { get; }
+        StreamReader SourceFileContent { get; set; }
 
         bool IsTextFile { get; }
     }

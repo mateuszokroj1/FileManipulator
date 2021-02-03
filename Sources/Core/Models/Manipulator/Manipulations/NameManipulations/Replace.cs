@@ -52,13 +52,11 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
 
                 DestinationFileName = Path.Combine(
                     Path.GetDirectoryName(fileInfo.DestinationFileName),
-
-                    !IsClearMode
+                    (!IsClearMode
                         ? Path.GetFileNameWithoutExtension(fileInfo.DestinationFileName)
                             .Replace(From ?? string.Empty, To ?? string.Empty)
-                        : string.Empty,
-
-                    Path.GetExtension(fileInfo.DestinationFileName)
+                        : string.Empty)
+                    + Path.GetExtension(fileInfo.DestinationFileName)
                 )
             });
         }

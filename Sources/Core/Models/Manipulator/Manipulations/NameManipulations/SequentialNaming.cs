@@ -120,8 +120,7 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
 
                 newInfo.DestinationFileName = Path.Combine(
                     Path.GetDirectoryName(fileInfo.DestinationFileName),
-                    builder.ToString(),
-                    Path.GetExtension(fileInfo.DestinationFileName));
+                    builder.ToString() + Path.GetExtension(fileInfo.DestinationFileName));
 
                 outputList.Add(newInfo);
             }
