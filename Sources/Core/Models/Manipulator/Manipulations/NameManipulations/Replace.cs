@@ -13,11 +13,13 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
         public Replace(ICollection<IManipulation> collection)
         {
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
+
+            IsClearModeChanged = CreatePropertyChangedObservable(nameof(IsClearMode), () => IsClearMode);
         }
 
         private readonly ICollection<IManipulation> collection;
         private string from, to;
-        private bool mustClear;
+        private bool isClearMode;
 
         public string From
         {
@@ -31,11 +33,13 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             set => SetProperty(ref this.to, value);
         }
 
-        public bool MustClear
+        public bool IsClearMode
         {
-            get => this.mustClear;
-            set => SetProperty(ref this.mustClear, value);
+            get => this.isClearMode;
+            set => SetProperty(ref this.isClearMode, value);
         }
+
+        public IObservable<bool> IsClearModeChanged { get; }
 
         public async Task<IEnumerable<IDestinationFileInfo>> ManipulateAsync(IEnumerable<IDestinationFileInfo> inputFiles)
         {
@@ -45,10 +49,15 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
                 SourceFileContent = fileInfo.SourceFileContent,
                 IsTextFile = fileInfo.IsTextFile,
                 DestinationFileContent = fileInfo.DestinationFileContent,
+
                 DestinationFileName = Path.Combine(
                     Path.GetDirectoryName(fileInfo.DestinationFileName),
-                    Path.GetFileNameWithoutExtension(fileInfo.DestinationFileName)
-                        .Replace(From ?? string.Empty, !MustClear ? To ?? string.Empty : string.Empty),
+
+                    !IsClearMode
+                        ? Path.GetFileNameWithoutExtension(fileInfo.DestinationFileName)
+                            .Replace(From ?? string.Empty, To ?? string.Empty)
+                        : string.Empty,
+
                     Path.GetExtension(fileInfo.DestinationFileName)
                 )
             });

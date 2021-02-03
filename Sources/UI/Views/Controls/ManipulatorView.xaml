@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:FileManipulator.UI"
              xmlns:nameFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.NameFilters;assembly=FileManipulator.Core"
              xmlns:contentFilters="clr-namespace:FileManipulator.Models.Manipulator.Filters.ContentFilters;assembly=FileManipulator.Core"
+             xmlns:nameManipulations="clr-namespace:FileManipulator.Models.Manipulator.Manipulations.NameManipulations;assembly=FileManipulator.Core"
+             xmlns:contentManipulations="clr-namespace:FileManipulator.Models.Manipulator.Manipulations.ContentManipulations;assembly=FileManipulator.Core"
              mc:Ignorable="d"
              Background="{x:Static SystemColors.ControlBrush}"
              d:DesignHeight="450" d:DesignWidth="800" DataContextChanged="UserControl_DataContextChanged">
@@ -46,9 +48,9 @@
                 <Expander Header="Filtracja nazw plików">
                     <StackPanel>
                         <ToolBar>
-                            <Button Content="Sortowanie alfabetyczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:ClassicSorting}" />
-                            <Button Content="Sortowanie alfanumeryczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:AlphanumericSorting}" />
-                            <Button Content="Sprawdzanie wyrażeń regularnych" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:RegexSearcher}" />
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Sortowanie alfabetyczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:ClassicSorting}" />
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Sortowanie alfanumeryczne" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:AlphanumericSorting}" />
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Sprawdzanie wyrażeń regularnych" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type nameFilters:RegexSearcher}" />
                         </ToolBar>
                         <ListBox ItemsSource="{Binding NameFilters}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
                     </StackPanel>
@@ -56,20 +58,25 @@
                 <Expander Header="Filtracja treści plików (tekstowych)">
                     <StackPanel>
                         <ToolBar>
-                            <Button Content="Sprawdzanie wyrażeń regularnych" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type contentFilters:RegexSearcher}" />
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Sprawdzanie wyrażeń regularnych" Command="{Binding AddFilterCommand}" CommandParameter="{x:Type contentFilters:RegexSearcher}" />
                         </ToolBar>
                         <ListBox ItemsSource="{Binding ContentFilters}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
                     </StackPanel>
                 </Expander>
                 <Expander Header="Grupowa zmiana nazw plików">
                     <StackPanel>
-                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ToolBar>
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Znajdź i zamień" Command="{Binding AddManipulationCommand}" CommandParameter="{x:Type nameManipulations:Replace}" />
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Sekwencyjna zmiana nazw" Command="{Binding AddManipulationCommand}" CommandParameter="{x:Type nameManipulations:SequentialNaming}"/>
+                        </ToolBar>
                         <ListBox ItemsSource="{Binding NameManipulations}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
                     </StackPanel>
                 </Expander>
                 <Expander Header="Manipulacja treścią">
                     <StackPanel>
-                        <Button Style="{StaticResource AddButtonStyle}"></Button>
+                        <ToolBar>
+                            <Button BorderBrush="#ccc" Margin="3,0" Content="Znajdź i zamień" Command="{Binding AddManipulationCommand}" CommandParameter="{x:Type contentManipulations:Replace}" />
+                        </ToolBar>
                         <ListBox ItemsSource="{Binding ContentManipulations}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
                     </StackPanel>
                 </Expander>
