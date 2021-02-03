@@ -143,7 +143,7 @@ namespace FileManipulator.Models.Manipulator
                     cancellationToken.ThrowIfCancellationRequested();
 
                     SynchronizationContext.Send(state => manipulation.State = SubTaskState.Working, null);
-                    await manipulation.ManipulateAsync(files);
+                    files = await manipulation.ManipulateAsync(files);
                     SynchronizationContext.Send(state => manipulation.State = SubTaskState.Done, null);
                 }
 

@@ -8,7 +8,7 @@ using FileManipulator.Models.Manipulator.Manipulations;
 
 namespace FileManipulator.ViewModels
 {
-    public interface IManipulatorViewModel
+    public interface IManipulatorViewModel : IDisposable
     {
         ICommand BrowseCommand { get; }
 
@@ -29,8 +29,6 @@ namespace FileManipulator.ViewModels
         IEnumerable<IContentManipulation> ContentManipulations { get; }
 
         FilesSelectorViewModel FilesSelectorViewModel { get; }
-
-        ObservableCollection<string> InputPaths { get; }
 
         bool IsMoving { get; set; }
 
