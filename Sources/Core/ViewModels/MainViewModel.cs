@@ -10,8 +10,11 @@ using System.Windows.Input;
 using FileManipulator.Models.Manipulator;
 using FileManipulator.Models.Watcher;
 
-namespace FileManipulator.ViewModels
+using Microsoft.WindowsAPICodePack.Dialogs;
 
+using Newtonsoft.Json;
+
+namespace FileManipulator.ViewModels
 {
     public class MainViewModel : ModelBase
     {
@@ -29,14 +32,23 @@ namespace FileManipulator.ViewModels
             CreateNewWatcherTaskCommand = new Command(() => CreateNew<Watcher>());
             CreateNewManipulatorTaskCommand = new Command(() => CreateNew<Manipulator>());
             HelpCommand = new Command(() => OpenHelp());
-            
+
             EditTaskNameCommand = new ReactiveCommand(
                 SelectedItemChanged.Select(_ => SelectedItem != null),
-                () => EditTaskName());
+                () => EditTaskName()
+            );
 
             CloseTaskCommand = new ReactiveCommand(
                 SelectedItemChanged.Select(_ => SelectedItem != null),
-                () => CloseTask());
+                () => CloseTask()
+            );
+
+            SaveTaskToFileCommand = new ReactiveCommand(
+                SelectedItemChanged.Select(_ => SelectedItem != null),
+                () => SaveTaskToFile()
+            );
+
+            LoadTaskFromFileCommand = new Command(() => LoadTaskFromFile());
         }
 
         #endregion
@@ -71,6 +83,10 @@ namespace FileManipulator.ViewModels
         public ICommand CreateNewManipulatorTaskCommand { get; }
 
         public ICommand EditTaskNameCommand { get; }
+
+        public ICommand SaveTaskToFileCommand { get; }
+
+        public ICommand LoadTaskFromFileCommand { get; }
 
         public ICommand CloseTaskCommand { get; }
 
@@ -113,6 +129,81 @@ namespace FileManipulator.ViewModels
             ITask task = TasksViewModel.GetSelectedTask();
 
             task.Name = RenameDialogAction(task.Name);
+        }
+
+        public async void SaveTaskToFile()
+        {
+            if (SelectedItem == null)
+                return;
+
+            var task = TasksViewModel.GetSelectedTask();
+
+            var path = string.Empty;
+
+            using (var dialog = new CommonSaveFileDialog())
+            {
+                dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                dialog.Title = "Zapisywanie do pliku";
+                var filter = new CommonFileDialogFilter();
+                filter.DisplayName = "JSON";
+                filter.Extensions.Add("json");
+                dialog.Filters.Add(filter);
+                dialog.DefaultExtension = "json";
+
+                if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                    return;
+
+                path = dialog.FileName;
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+                return;
+
+            FileStream file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+
+            file.SetLength(0);
+
+            using (var writer = new StreamWriter(file))
+            {
+                var content = JsonConvert.SerializeObject(task);
+
+                await writer.WriteAsync(content);
+
+                await writer.FlushAsync();
+            }
+
+            file.Close();
+        }
+
+        public void LoadTaskFromFile()
+        {
+            var path = string.Empty;
+
+            using (var dialog = new CommonOpenFileDialog())
+            {
+                dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                dialog.Title = "Wczytywanie z pliku";
+                var filter = new CommonFileDialogFilter();
+                filter.DisplayName = "JSON";
+                filter.Extensions.Add("json");
+                dialog.Filters.Add(filter);
+                dialog.EnsureFileExists = true;
+                dialog.Multiselect = false;
+
+                if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                    return;
+
+                path = dialog.FileName;
+            }
+
+            var content = File.ReadAllText(path);
+
+            ITask result = JsonConvert.DeserializeObject<Watcher>(content);
+
+            if (result == null)
+                result = JsonConvert.DeserializeObject<Manipulator>(content);
+
+            TasksViewModel.Model.Add(result);
         }
 
         public void OpenHelp()
