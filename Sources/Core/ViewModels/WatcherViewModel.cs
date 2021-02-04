@@ -20,7 +20,10 @@ namespace FileManipulator.ViewModels
             ClearCommand = new Command(() => Clear());
             BrowseCommand = new Command(() => Browse());
 
-            StartCommand = new ReactiveCommand(Model.CanStartChanged, () => Start());
+            if(!Model.CanStart) // BUG: ustawienie ścieżki chwilę przed stworzeniem komendy Start, przez co przycisk zostaje zablokowany, TODO: poczekać z przypisaniem ścieżki do momentu gotowości ViewModelu
+                StartCommand = new ReactiveCommand(Model.CanStartChanged, () => Start());
+            else
+                StartCommand = new Command(() => Start());
             PauseCommand = new ReactiveCommand(Model.CanPauseChanged, () => Pause());
             StopCommand = new ReactiveCommand(Model.CanStopChanged, () => Stop());
 
@@ -33,36 +36,35 @@ namespace FileManipulator.ViewModels
 
             PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
 
-            this.watcherObservers[2] = PathChanged.Subscribe(_ =>
-            {
-                if(Model.Path != Path)
-                    Model.Path = Path;
-            });
+            PathChanged
+                .Subscribe(path => Model.Path = path);
 
             IsDirectoryPath = true;
 
-            Model.CreatePropertyChangedObservable(nameof(Model.Path), () => Model.Path)
-                .Subscribe(_ =>
+            Model.PathChanged.Subscribe(_ =>
                 {
                     if(File.Exists(Model.Path))
                     {
-                        Path = Model.Path;
                         IsDirectoryPath = false;
+                        Path = Model.Path;
                     }
                     else if(Directory.Exists(Model.Path))
                     {
-                        Path = Model.Path;
                         IsDirectoryPath = true;
+                        Path = Model.Path;
                     }
                     else
                     {
-                        Path = null;
                         IsDirectoryPath = false;
+                        Path = null;
 
                         if(Path != Model.Path)
                             Model.Path = null;
                     }
                 });
+
+            Path = watcher.Path;
+            IncludeSubdirectories = watcher.IncludeSubdirectories;
         }
 
         #endregion
@@ -73,6 +75,7 @@ namespace FileManipulator.ViewModels
         private string path;
         private bool includeSubdirectories;
         private readonly IDisposable[] watcherObservers = new IDisposable[3];
+        private ICommand startCommand;
 
         #endregion
 
@@ -102,7 +105,11 @@ namespace FileManipulator.ViewModels
             set => SetProperty(ref this.isDirectoryPath, value);
         }
 
-        public ICommand StartCommand { get; }
+        public ICommand StartCommand
+        {
+            get => this.startCommand;
+            set => SetProperty(ref this.startCommand, value);
+        }
 
         public ICommand PauseCommand { get; }
 
@@ -158,6 +165,8 @@ namespace FileManipulator.ViewModels
                 OnError?.Invoke(Model.LastError);
                 return;
             }
+
+            StartCommand = new ReactiveCommand(Model.CanStartChanged, () => Start());
 
             if (Model.State != TaskState.Ready || !Model.CanStart)
                 return;

@@ -60,14 +60,14 @@ namespace FileManipulator.Models.Manipulator.Manipulations.ContentManipulations
             if (simpleObject == null)
                 return false;
 
-            if (simpleObject.Type != SimpleName)
+            if (simpleObject.Type.Value != SimpleName)
                 return false;
 
-            if (simpleObject.Properties == null)
+            if (simpleObject.Parameters == null)
                 return false;
 
-            From = simpleObject.Properties.From;
-            To = simpleObject.Properties.To;
+            From = simpleObject.Parameters.From.Value;
+            To = simpleObject.Parameters.To.Value;
 
             return true;
         }

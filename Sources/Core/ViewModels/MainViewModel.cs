@@ -167,7 +167,7 @@ namespace FileManipulator.ViewModels
 
             using (var writer = new StreamWriter(file))
             {
-                var content = JsonConvert.SerializeObject(task);
+                var content = task.GenerateJson();
 
                 await writer.WriteAsync(content);
 
@@ -200,12 +200,15 @@ namespace FileManipulator.ViewModels
 
             var content = File.ReadAllText(path);
 
-            ITask result = JsonConvert.DeserializeObject<Watcher>(content);
+            ITask task = new Watcher(Tasks);
+            if(!task.LoadJson(content))
+            {
+                task = new Manipulator(Tasks, MessageOnCloseWhileTaskWorking);
+                if (!task.LoadJson(content))
+                    return;
+            }
 
-            if (result == null)
-                result = JsonConvert.DeserializeObject<Manipulator>(content);
-
-            TasksViewModel.Model.Add(result);
+            TasksViewModel.Model.Add(task);
         }
 
         public void OpenHelp()

@@ -41,13 +41,13 @@ namespace FileManipulator.Models.Manipulator.Filters.NameFilters
             if (simpleObject == null)
                 return false;
 
-            if (simpleObject.Type != SimpleName)
+            if (simpleObject.Type.Value != SimpleName)
                 return false;
 
-            if (simpleObject.Properties == null)
+            if (simpleObject.Parameters == null)
                 return false;
 
-            SortMode = (SortMode)simpleObject.Properties.SortMode;
+            SortMode = (SortMode)simpleObject.Parameters.SortMode.Value;
 
             return true;
         }

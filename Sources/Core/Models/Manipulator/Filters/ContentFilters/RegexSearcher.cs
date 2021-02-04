@@ -43,13 +43,13 @@ namespace FileManipulator.Models.Manipulator.Filters.ContentFilters
             if (simpleObject == null)
                 return false;
 
-            if (simpleObject.Type != SimpleName)
+            if (simpleObject.Type.Value != SimpleName)
                 return false;
 
-            if (simpleObject.Properties == null)
+            if (simpleObject.Parameters == null)
                 return false;
 
-            Regex = new Regex(simpleObject.Properties.Regex);
+            Regex = new Regex(simpleObject.Parameters.Regex.Pattern.Value);
 
             return true;
         }

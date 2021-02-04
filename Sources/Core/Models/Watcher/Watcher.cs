@@ -23,9 +23,11 @@ namespace FileManipulator.Models.Watcher
             Name = generator.Generate();
             ResetAsync().Wait();
 
+            PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
+
             this.pathObserver =
-                CreatePropertyChangedObservable(nameof(Path), () => Path)
-                .Where(_ => State != TaskState.Working && State != TaskState.Paused)
+                PathChanged
+                //.Where(_ => State != TaskState.Working && State != TaskState.Paused)
                 .Subscribe(async p =>
                 {
                     this.watcher?.Dispose();
@@ -80,7 +82,7 @@ namespace FileManipulator.Models.Watcher
         public string Path
         {
             get => this.path;
-            set => SetProperty(ref this.path, value, nameof(Path), nameof(CanStart));
+            set => SetProperty(ref this.path, value, nameof(Path));
         }
 
         public bool IncludeSubdirectories
@@ -103,6 +105,8 @@ namespace FileManipulator.Models.Watcher
         public bool CanStop => State == TaskState.Working || State == TaskState.Paused;
 
         public bool CanStart => (State == TaskState.Stopped || State == TaskState.Ready) && CheckPathIsValid(Path);
+
+        public IObservable<string> PathChanged { get; }
 
         public ObservableCollection<WatcherAction> Actions { get; } = new ObservableCollection<WatcherAction>();
 

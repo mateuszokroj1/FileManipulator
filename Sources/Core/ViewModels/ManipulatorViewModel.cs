@@ -93,6 +93,34 @@ namespace FileManipulator.ViewModels
 
             AddFilterCommand = new Command(type => AddFilter(type as Type));
             AddManipulationCommand = new Command(type => AddManipulation(type as Type));
+
+            NameFilters = Model.Filters
+                    .Select(filter => filter as INameFilter)
+                    .Where(filter => filter != null);
+
+            ContentFilters = Model.Filters
+                .Select(filter => filter as IContentFilter)
+                .Where(filter => filter != null);
+
+            OnPropertyChanged(nameof(NameFilters));
+            OnPropertyChanged(nameof(ContentFilters));
+
+            NameManipulations = Model.Manipulations
+                    .Select(filter => filter as INameManipulation)
+                    .Where(filter => filter != null);
+
+            ContentManipulations = Model.Manipulations
+                .Select(filter => filter as IContentManipulation)
+                .Where(filter => filter != null);
+
+            OnPropertyChanged(nameof(NameManipulations));
+            OnPropertyChanged(nameof(ContentManipulations));
+
+            foreach (var file in Model.FilePaths)
+            FilesSelectorViewModel.Files.Add(file);
+
+            OutputDirectory = Model.DestinationDir;
+            IsMoving = !string.IsNullOrEmpty(Model.DestinationDir);
         }
 
         #endregion

@@ -134,22 +134,22 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             if (simpleObject == null)
                 return false;
 
-            if (simpleObject.Type != SimpleName)
+            if (simpleObject.Type.Value != SimpleName)
                 return false;
 
-            if (simpleObject.Properties == null)
+            if (simpleObject.Parameters == null)
                 return false;
 
-            AddPrefix = simpleObject.Properties.AddPrefix;
-            Prefix = simpleObject.Properties.Prefix;
-            AddSuffix = simpleObject.Properties.AddSuffix;
-            Suffix = simpleObject.Properties.Suffix;
+            AddPrefix = simpleObject.Parameters.AddPrefix.Value;
+            Prefix = simpleObject.Parameters.Prefix.Value;
+            AddSuffix = simpleObject.Parameters.AddSuffix.Value;
+            Suffix = simpleObject.Parameters.Suffix.Value;
 
-            IsIndexing = simpleObject.Properties.IsIndexing;
-            StartNumber = simpleObject.Properties.StartNumber;
-            Increment = simpleObject.Properties.Increment;
-            FixedPlaces = simpleObject.Properties.FixedPlaces;
-            SeparateWith = simpleObject.Properties.SeparateWith;
+            IsIndexing = simpleObject.Parameters.IsIndexing.Value;
+            StartNumber = simpleObject.Parameters.StartNumber.Value;
+            Increment = simpleObject.Parameters.Increment.Value;
+            FixedPlaces = simpleObject.Parameters.FixedPlaces.Value;
+            SeparateWith = simpleObject.Parameters.SeparateWith.Value;
 
             return true;
         }

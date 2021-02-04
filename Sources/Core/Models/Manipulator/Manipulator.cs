@@ -341,7 +341,12 @@ namespace FileManipulator.Models.Manipulator
                 if (deserialized.Parameters == null)
                     return false;
 
-                FilePaths = deserialized.Parameters.FilePaths;
+                var files = new List<string>();
+
+                foreach (var file in deserialized.Parameters.FilePaths)
+                    files.Add(file?.Value);
+
+                FilePaths = files;
 
                 DestinationDir = deserialized.Parameters.DestinationDir;
 
@@ -380,13 +385,13 @@ namespace FileManipulator.Models.Manipulator
                 typeof(ClassicSorting)
             };
 
-            IEnumerable<IFilter> initializedFilters = filterTypes.Select(type => Activator.CreateInstance(type, collection) as IFilter);
+            IEnumerable<ISubTask> initializedFilters = filterTypes.Select(type => Activator.CreateInstance(type, collection) as ISubTask);
 
             try
             {
                 foreach (var filterToLoad in initializedFilters)
                     if (filterToLoad.LoadFromSimpleObject(simpleObject))
-                        return filterToLoad;
+                        return filterToLoad as IFilter;
             }
             catch(Exception) { return null; }
 
@@ -402,13 +407,13 @@ namespace FileManipulator.Models.Manipulator
                 typeof(SequentialNaming)
             };
 
-            IEnumerable<IManipulation> initializedManipulations = manipulationTypes.Select(type => Activator.CreateInstance(type, collection) as IManipulation);
+            IEnumerable<ISubTask> initializedManipulations = manipulationTypes.Select(type => Activator.CreateInstance(type, collection) as ISubTask);
 
             try
             {
                 foreach (var manipulationToLoad in initializedManipulations)
                     if (manipulationToLoad.LoadFromSimpleObject(simpleObject))
-                        return manipulationToLoad;
+                        return manipulationToLoad as IManipulation;
             }
             catch (Exception) { return null; }
 

@@ -67,14 +67,15 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             if (simpleObject == null)
                 return false;
 
-            if (simpleObject.Type != SimpleName)
+            if (simpleObject.Type.Value != SimpleName)
                 return false;
 
-            if (simpleObject.Properties == null)
+            if (simpleObject.Parameters == null)
                 return false;
 
-            From = simpleObject.Properties.From;
-            To = simpleObject.Properties.To;
+            From = simpleObject.Parameters.From.Value;
+            To = simpleObject.Parameters.To.Value;
+            IsClearMode = simpleObject.Parameters.IsClearMode.Value;
 
             return true;
         }
@@ -87,7 +88,8 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
                 Parameters = new
                 {
                     From = From,
-                    To = To
+                    To = To,
+                    IsClearMode = IsClearMode
                 }
             };
         }
