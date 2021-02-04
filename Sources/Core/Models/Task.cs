@@ -108,6 +108,10 @@ namespace FileManipulator
         /// </summary>
         public abstract STT.Task ResetAsync();
 
+        public abstract bool LoadJson(string content);
+
+        public abstract string GenerateJson();
+
         public virtual void Close(ICollection<ITask> collection)
         {
             collection.Remove(this);

@@ -33,6 +33,10 @@ namespace FileManipulator
 
         STT.Task ResetAsync();
 
+        string GenerateJson();
+
+        bool LoadJson(string content);
+
         #endregion
     }
 }

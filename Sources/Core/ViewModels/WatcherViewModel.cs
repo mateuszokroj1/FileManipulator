@@ -33,9 +33,36 @@ namespace FileManipulator.ViewModels
 
             PathChanged = CreatePropertyChangedObservable(nameof(Path), () => Path);
 
-            this.watcherObservers[2] = PathChanged.Subscribe(_ => Model.Path = Path);
+            this.watcherObservers[2] = PathChanged.Subscribe(_ =>
+            {
+                if(Model.Path != Path)
+                    Model.Path = Path;
+            });
 
             IsDirectoryPath = true;
+
+            Model.CreatePropertyChangedObservable(nameof(Model.Path), () => Model.Path)
+                .Subscribe(_ =>
+                {
+                    if(File.Exists(Model.Path))
+                    {
+                        Path = Model.Path;
+                        IsDirectoryPath = false;
+                    }
+                    else if(Directory.Exists(Model.Path))
+                    {
+                        Path = Model.Path;
+                        IsDirectoryPath = true;
+                    }
+                    else
+                    {
+                        Path = null;
+                        IsDirectoryPath = false;
+
+                        if(Path != Model.Path)
+                            Model.Path = null;
+                    }
+                });
         }
 
         #endregion

@@ -17,6 +17,7 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             IsClearModeChanged = CreatePropertyChangedObservable(nameof(IsClearMode), () => IsClearMode);
         }
 
+        private const string SimpleName = "NameManipulations.Replace";
         private readonly ICollection<IManipulation> collection;
         private string from, to;
         private bool isClearMode;
@@ -59,6 +60,36 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
                     + Path.GetExtension(fileInfo.DestinationFileName)
                 )
             });
+        }
+
+        public override bool LoadFromSimpleObject(dynamic simpleObject)
+        {
+            if (simpleObject == null)
+                return false;
+
+            if (simpleObject.Type != SimpleName)
+                return false;
+
+            if (simpleObject.Properties == null)
+                return false;
+
+            From = simpleObject.Properties.From;
+            To = simpleObject.Properties.To;
+
+            return true;
+        }
+
+        public override object GetSimpleObject()
+        {
+            return new
+            {
+                Type = SimpleName,
+                Parameters = new
+                {
+                    From = From,
+                    To = To
+                }
+            };
         }
 
         public override void Close()

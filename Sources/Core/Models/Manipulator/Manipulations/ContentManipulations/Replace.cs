@@ -14,6 +14,7 @@ namespace FileManipulator.Models.Manipulator.Manipulations.ContentManipulations
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
         }
 
+        private const string SimpleName = "ContentManipulations.Replace";
         private readonly ICollection<IManipulation> collection;
         private string from, to;
 
@@ -31,8 +32,10 @@ namespace FileManipulator.Models.Manipulator.Manipulations.ContentManipulations
 
         public async Task<IEnumerable<IDestinationFileInfo>> ManipulateAsync(IEnumerable<IDestinationFileInfo> inputFiles)
         {
+            var _locker = new object();
             var outputList = new List<IDestinationFileInfo>(inputFiles.Count());
-            foreach(var fileInfo in inputFiles)
+
+            Parallel.ForEach(inputFiles, fileInfo => 
             {
                 if (fileInfo.IsTextFile)
                 {
@@ -43,13 +46,43 @@ namespace FileManipulator.Models.Manipulator.Manipulations.ContentManipulations
                     newInfo.DestinationFileName = fileInfo.DestinationFileName;
                     newInfo.DestinationFileContent = fileInfo.DestinationFileContent.Replace(From ?? string.Empty, To ?? string.Empty);
 
-                    outputList.Add(newInfo);
+                    lock(_locker) outputList.Add(newInfo);
                 }
                 else
-                    outputList.Add(fileInfo);
-            }
+                   lock(_locker) outputList.Add(fileInfo);
+            });
 
             return outputList;
+        }
+
+        public override bool LoadFromSimpleObject(dynamic simpleObject)
+        {
+            if (simpleObject == null)
+                return false;
+
+            if (simpleObject.Type != SimpleName)
+                return false;
+
+            if (simpleObject.Properties == null)
+                return false;
+
+            From = simpleObject.Properties.From;
+            To = simpleObject.Properties.To;
+
+            return true;
+        }
+
+        public override object GetSimpleObject()
+        {
+            return new
+            {
+                Type = SimpleName,
+                Parameters = new
+                {
+                    From = From,
+                    To = To
+                }
+            };
         }
 
         public override void Close()

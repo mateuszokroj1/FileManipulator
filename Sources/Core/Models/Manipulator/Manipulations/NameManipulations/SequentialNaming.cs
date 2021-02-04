@@ -20,6 +20,7 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             SeparateWith = string.Empty;
         }
 
+        private const string SimpleName = "NameManipulations.SequentialNaming";
         private readonly ICollection<IManipulation> collection;
         private bool addPrefix, addSuffix, isIndexing;
         private string prefix, suffix, separateWith;
@@ -126,6 +127,51 @@ namespace FileManipulator.Models.Manipulator.Manipulations.NameManipulations
             }
 
             return outputList;
+        }
+
+        public override bool LoadFromSimpleObject(dynamic simpleObject)
+        {
+            if (simpleObject == null)
+                return false;
+
+            if (simpleObject.Type != SimpleName)
+                return false;
+
+            if (simpleObject.Properties == null)
+                return false;
+
+            AddPrefix = simpleObject.Properties.AddPrefix;
+            Prefix = simpleObject.Properties.Prefix;
+            AddSuffix = simpleObject.Properties.AddSuffix;
+            Suffix = simpleObject.Properties.Suffix;
+
+            IsIndexing = simpleObject.Properties.IsIndexing;
+            StartNumber = simpleObject.Properties.StartNumber;
+            Increment = simpleObject.Properties.Increment;
+            FixedPlaces = simpleObject.Properties.FixedPlaces;
+            SeparateWith = simpleObject.Properties.SeparateWith;
+
+            return true;
+        }
+
+        public override object GetSimpleObject()
+        {
+            return new
+            {
+                Type = SimpleName,
+                Parameters = new
+                {
+                    AddPrefix,
+                    Prefix = AddPrefix ? Prefix : null,
+                    AddSuffix,
+                    Suffix = AddSuffix,
+                    IsIndexing,
+                    StartNumber,
+                    Increment,
+                    FixedPlaces,
+                    SeparateWith
+                }
+            };
         }
 
         public override void Close()

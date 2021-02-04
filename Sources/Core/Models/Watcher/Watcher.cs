@@ -5,6 +5,8 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Threading;
 
+using Newtonsoft.Json;
+
 using STT = System.Threading.Tasks;
 
 namespace FileManipulator.Models.Watcher
@@ -278,6 +280,42 @@ namespace FileManipulator.Models.Watcher
             }));
 
             OnPropertyChanged(nameof(IncludeSubdirectories));
+        }
+
+        public override string GenerateJson()
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                Type = "Watcher",
+                Parameters = new {
+                    Path = Path,
+                    IncludeSubdirectories = IncludeSubdirectories
+                }
+            });
+        }
+
+        public override bool LoadJson(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return false;
+
+            try
+            {
+                dynamic deserialized = JsonConvert.DeserializeObject(content);
+
+                if (deserialized == null)
+                    return false;
+
+                if (deserialized.Type != "Watcher")
+                    return false;
+
+                Path = deserialized.Parameters.Path;
+
+                IncludeSubdirectories = deserialized.Parameters.IncludeSubdirectories;
+            }
+            catch(Exception) { return false; }
+
+            return true;
         }
 
         public async void Close()

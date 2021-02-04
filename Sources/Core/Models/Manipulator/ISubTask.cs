@@ -12,6 +12,10 @@ namespace FileManipulator.Models.Manipulator
 
         SynchronizationContext SynchronizationContext { get; }
 
+        object GetSimpleObject();
+
+        bool LoadFromSimpleObject(dynamic simpleObject);
+
         void Close();
     }
 }

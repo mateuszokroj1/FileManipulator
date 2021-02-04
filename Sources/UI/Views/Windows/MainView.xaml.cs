@@ -18,7 +18,7 @@ namespace FileManipulator.UI
             model.RenameDialogAction = RenameAction;
 
             MainViewModel.ConfirmationOnStart = () =>
-                MessageBox.Show("Za chwilę zostaną wykonane sytuacje nieodwracalne na systemie plików.\n\rCzy na pewno chcesz rozpocząć?",
+                MessageBox.Show("Za chwilę zostaną wykonane operacje nieodwracalne na systemie plików.\n\rCzy na pewno chcesz rozpocząć?",
                 "Manipulator",
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK;
 

@@ -25,6 +25,10 @@ namespace FileManipulator.Models.Manipulator
 
         public ICommand CloseCommand { get; }
 
+        public abstract bool LoadFromSimpleObject(dynamic simpleObject);
+
+        public abstract object GetSimpleObject();
+
         public SynchronizationContext SynchronizationContext { get; } = SynchronizationContext.Current;
 
         public abstract void Close();

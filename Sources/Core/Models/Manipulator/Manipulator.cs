@@ -8,7 +8,12 @@ using System.Threading.Tasks;
 
 using FileManipulator.Models.Manipulator.FileInfos;
 using FileManipulator.Models.Manipulator.Filters;
+using FileManipulator.Models.Manipulator.Filters.ContentFilters;
+using FileManipulator.Models.Manipulator.Filters.NameFilters;
 using FileManipulator.Models.Manipulator.Manipulations;
+using FileManipulator.Models.Manipulator.Manipulations.NameManipulations;
+
+using Newtonsoft.Json;
 
 using STT = System.Threading.Tasks;
 
@@ -299,6 +304,115 @@ namespace FileManipulator.Models.Manipulator
                 Stopping.OnNext(new TaskEventArgs(this));
                 this.cancellationTokenSource.Cancel();
             }
+        }
+
+        public override string GenerateJson()
+        {
+            var filters = Filters.Select(filter => filter.GetSimpleObject());
+            var manipulations = Manipulations.Select(manipulation => manipulation.GetSimpleObject());
+
+            return JsonConvert.SerializeObject(new
+            {
+                Type = "Manipulator",
+                Parameters = new {
+                    FilePaths = FilePaths,
+                    DestinationDir = DestinationDir,
+                    Filters = filters,
+                    Manipulations = manipulations
+                }
+            });
+        }
+
+        public override bool LoadJson(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return false;
+
+            try
+            {
+                dynamic deserialized = JsonConvert.DeserializeObject(content);
+
+                if (deserialized == null)
+                    return false;
+
+                if (deserialized.Type != "Manipulator")
+                    return false;
+
+                if (deserialized.Parameters == null)
+                    return false;
+
+                FilePaths = deserialized.Parameters.FilePaths;
+
+                DestinationDir = deserialized.Parameters.DestinationDir;
+
+                dynamic filters = deserialized.Parameters.Filters;
+                if(filters != null)
+                    foreach (var filterSimpleObject in filters)
+                    {
+                        IFilter createdFilter = LoadFilterFromSimpleObject(filterSimpleObject, Filters);
+
+                        if (createdFilter != null)
+                            Filters.Add(createdFilter);
+                    }
+
+                dynamic manipulations = deserialized.Parameters.Manipulations;
+                if (manipulations != null)
+                    foreach (var manipulationSimpleObject in manipulations)
+                    {
+                        IManipulation createdManipulation = LoadManipulationFromSimpleObject(manipulationSimpleObject, Manipulations);
+
+                        if (createdManipulation != null)
+                            Manipulations.Add(createdManipulation);
+                    }
+            }
+            catch (Exception) { return false; }
+
+            return true;
+        }
+
+        private static IFilter LoadFilterFromSimpleObject(dynamic simpleObject, ICollection<IFilter> collection)
+        {
+            var filterTypes = new Type[]
+            {
+                typeof(Filters.NameFilters.RegexSearcher),
+                typeof(Filters.ContentFilters.RegexSearcher),
+                typeof(AlphanumericSorting),
+                typeof(ClassicSorting)
+            };
+
+            IEnumerable<IFilter> initializedFilters = filterTypes.Select(type => Activator.CreateInstance(type, collection) as IFilter);
+
+            try
+            {
+                foreach (var filterToLoad in initializedFilters)
+                    if (filterToLoad.LoadFromSimpleObject(simpleObject))
+                        return filterToLoad;
+            }
+            catch(Exception) { return null; }
+
+            return null;
+        }
+
+        private static IManipulation LoadManipulationFromSimpleObject(dynamic simpleObject, ICollection<IManipulation> collection)
+        {
+            var manipulationTypes = new Type[]
+            {
+                typeof(Replace),
+                typeof(Manipulations.ContentManipulations.Replace),
+                typeof(SequentialNaming)
+            };
+
+            IEnumerable<IManipulation> initializedManipulations = manipulationTypes.Select(type => Activator.CreateInstance(type, collection) as IManipulation);
+
+            try
+            {
+                foreach (var manipulationToLoad in initializedManipulations)
+                    if (manipulationToLoad.LoadFromSimpleObject(simpleObject))
+                        return manipulationToLoad;
+            }
+            catch (Exception) { return null; }
+
+            return null;
         }
 
         public async void Close()

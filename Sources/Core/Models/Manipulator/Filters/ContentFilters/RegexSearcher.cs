@@ -15,6 +15,7 @@ namespace FileManipulator.Models.Manipulator.Filters.ContentFilters
             this.collection = subTaskCollection ?? throw new ArgumentNullException(nameof(subTaskCollection));
         }
 
+        private const string SimpleName = "ContentFilters.RegexSearcher";
         private Regex regex;
         private readonly ICollection<IFilter> collection;
 
@@ -35,6 +36,34 @@ namespace FileManipulator.Models.Manipulator.Filters.ContentFilters
         public override void Close()
         {
             this.collection.Remove(this);
+        }
+
+        public override bool LoadFromSimpleObject(dynamic simpleObject)
+        {
+            if (simpleObject == null)
+                return false;
+
+            if (simpleObject.Type != SimpleName)
+                return false;
+
+            if (simpleObject.Properties == null)
+                return false;
+
+            Regex = new Regex(simpleObject.Properties.Regex);
+
+            return true;
+        }
+
+        public override object GetSimpleObject()
+        {
+            return new
+            {
+                Type = SimpleName,
+                Parameters = new
+                { 
+                    Regex = Regex
+                }
+            };
         }
     }
 }

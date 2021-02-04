@@ -14,6 +14,7 @@ namespace FileManipulator.Models.Manipulator.Filters.NameFilters
             this.collection = subTasksCollection ?? throw new ArgumentNullException(nameof(subTasksCollection));
         }
 
+        private const string SimpleName = "NameFilters.ClassicSorting";
         private SortMode sortMode;
         private readonly ICollection<IFilter> collection;
 
@@ -33,6 +34,34 @@ namespace FileManipulator.Models.Manipulator.Filters.NameFilters
                 return inputList.OrderByDescending(item => item.SourceFileName, StringComparer.InvariantCulture);
             else
                 throw new InvalidOperationException("Invalid parameter value: SortMode.");
+        }
+
+        public override bool LoadFromSimpleObject(dynamic simpleObject)
+        {
+            if (simpleObject == null)
+                return false;
+
+            if (simpleObject.Type != SimpleName)
+                return false;
+
+            if (simpleObject.Properties == null)
+                return false;
+
+            SortMode = (SortMode)simpleObject.Properties.SortMode;
+
+            return true;
+        }
+
+        public override object GetSimpleObject()
+        {
+            return new
+            {
+                Type = SimpleName,
+                Parameters = new
+                {
+                    SortMode = SortMode
+                }
+            };
         }
 
         public override void Close()
