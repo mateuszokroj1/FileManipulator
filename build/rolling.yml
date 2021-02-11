@@ -21,16 +21,14 @@ steps:
     packageType: 'sdk'
     version: '5.0.x'
 
-- task: DotNetCoreCLI@2
-  displayName: Restore Nugets
+- task: NuGetCommand@2
+  displayName: Restor Nugets
   inputs:
     command: 'restore'
-    projects: '**/*.csproj'
+    restoreSolution: '**/*.sln'
     feedsToUse: 'select'
 
-- task: DotNetCoreCLI@2
-  displayName: Build all projects
+- task: VSBuild@1
   inputs:
-    command: 'build'
-    projects: '**/*.csproj'
-    configuration: Debug
+    solution: '**\*.sln'
+    configuration: 'Debug'
