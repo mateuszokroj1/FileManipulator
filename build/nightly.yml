@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: Nightly build
+
+trigger: none
+
+schedules:
+  - cron: "0 0 0 * *"
+    displayName: Daily nightly build
+    branches:
+     include:
+       - master
+       - Features/*
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+
+- task: UseDotNet@2
+  displayName: Install .NET 5
+  inputs:
+    packageType: 'sdk'
+    version: '5.0.x'
+
+- task: NuGetCommand@2
+  displayName: Restore Nugets
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+
+- task: VSBuild@1
+  displayName: Build solution
+  inputs:
+    solution: '**\*.sln'
+    configuration: 'Release'
+
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: 'test'
+    projects: '**/*.csproj'
