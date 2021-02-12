@@ -1,0 +1,58 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: Release stable for GitHub
+
+trigger: none
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+
+- task: UseDotNet@2
+  displayName: Install .NET Core 3.1
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.x'
+
+- task: UseDotNet@2
+  displayName: Install .NET 5
+  inputs:
+    packageType: 'sdk'
+    version: '5.0.x'
+
+- task: NuGetCommand@2
+  displayName: Restore solution
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+
+- task: VSBuild@1
+  displayName: Build solution
+  inputs:
+    solution: '**\*.sln'
+    configuration: 'Release'
+    clean: true
+
+- task: ArchiveFiles@2
+  displayName: Pack to ZIP
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Major).$(Minor).$(Patch).zip'
+    replaceExistingArchive: true
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'publish'
+    publishDirectory: '$(Build.ArtifactStagingDirectory)'
+    feedsToUsePublish: 'internal'
+    vstsFeedPublish: '87e9c7ca-c396-47f2-85b5-b9fba79fd759/0dc7c39a-5994-42c5-b326-51102f5650d5'
+    vstsFeedPackagePublish: 'FileManipulator'
+    versionOption: 'custom'
+    versionPublish: '$(Major).$(Minor).$(Patch)'
