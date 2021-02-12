@@ -5,6 +5,19 @@
 
 name: Release stable for GitHub
 
+parameters:
+  - name: Major
+    type: number
+    default: 1
+  
+  - name: Minor
+    type: number
+    default: 0
+
+  - name: Patch
+    type: number
+    default: 0
+
 trigger: none
 
 pool:
@@ -47,12 +60,13 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Major).$(Minor).$(Patch).zip'
     replaceExistingArchive: true
 
-- task: UniversalPackages@0
+- task: GitHubRelease@1
+  displayName: GitHub Release
   inputs:
-    command: 'publish'
-    publishDirectory: '$(Build.ArtifactStagingDirectory)'
-    feedsToUsePublish: 'internal'
-    vstsFeedPublish: '87e9c7ca-c396-47f2-85b5-b9fba79fd759/0dc7c39a-5994-42c5-b326-51102f5650d5'
-    vstsFeedPackagePublish: 'FileManipulator'
-    versionOption: 'custom'
-    versionPublish: '$(Major).$(Minor).$(Patch)'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'gitTag'
+    title: 'File Manipulator - stable'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
