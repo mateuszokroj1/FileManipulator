@@ -63,10 +63,11 @@ steps:
 - task: GitHubRelease@1
   displayName: GitHub Release
   inputs:
-    repositoryName: '$(Build.Repository.Name)'
+    repositoryName: 'FileManipulator'
     action: 'create'
-    target: '$(Build.SourceVersion)'
+    target: '$(Major).$(Minor).$(Patch)'
     tagSource: 'gitTag'
     title: 'File Manipulator - stable'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
+    gitHubConnection: d21cd71c4b0f929b0c9d099b34baecc888c0fb68
