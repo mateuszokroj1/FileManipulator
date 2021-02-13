@@ -60,15 +60,8 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/release.zip'
     replaceExistingArchive: true
 
-- task: GitHubRelease@1
-  displayName: GitHub Release
+- task: PublishPipelineArtifact@1
   inputs:
-    gitHubConnection: 'd21cd71c4b0f929b0c9d099b34baecc888c0fb68'
-    repositoryName: 'FileManipulator'
-    action: 'create'
-    target: '$(Major).$(Minor).$(Patch)'
-    tagSource: 'gitTag'
-    title: 'File Manipulator - stable'
-    assets: '$(Build.ArtifactStagingDirectory)/release.zip'
-    changeLogCompareToRelease: 'lastFullRelease'
-    changeLogType: 'commitBased'
+    targetPath: '$(Pipeline.Workspace)'
+    artifact: 'Release stable'
+    publishLocation: 'pipeline'
