@@ -23,7 +23,7 @@ steps:
     version: '3.1.x'
 
 - task: NuGetCommand@2
-  displayName: Restor Nugets
+  displayName: Restore packages in solution
   inputs:
     command: 'restore'
     restoreSolution: '**/*.sln'
