@@ -3,7 +3,7 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-name: Release stable for GitHub
+name: Release stable and publish in Pipeline
 
 parameters:
   - name: Major
@@ -18,6 +18,10 @@ parameters:
     type: number
     default: 0
 
+variables:
+ - name: ReleaseDirectory
+   value: '$(Build.SourcesDirectory)\Sources\UI\bin\Release'
+
 trigger: none
 
 pool:
@@ -30,12 +34,6 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '3.1.x'
-
-- task: UseDotNet@2
-  displayName: Install .NET 5
-  inputs:
-    packageType: 'sdk'
-    version: '5.0.x'
 
 - task: NuGetCommand@2
   displayName: Restore solution
@@ -51,17 +49,15 @@ steps:
     configuration: 'Release'
     clean: true
 
-- task: ArchiveFiles@2
-  displayName: Pack to ZIP
+- task: DeleteFiles@1
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
-    includeRootFolder: true
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/release.zip'
-    replaceExistingArchive: true
+    SourceFolder: '$(ReleaseDirectory)'
+    Contents: |
+      *.pdb
+      *.xml
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Pipeline.Workspace)'
+    targetPath: '$(ReleaseDirectory)'
     artifact: 'Release stable'
     publishLocation: 'pipeline'
